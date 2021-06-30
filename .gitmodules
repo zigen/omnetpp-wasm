@@ -1,0 +1,9 @@
+[submodule "omnetpp"]
+	path = omnetpp
+	url = git@github.com:zigen/omnetpp
+[submodule "libxml2"]
+	path = libxml2
+	url = https://gitlab.gnome.org/GNOME/libxml2.git
+[submodule "qtbase"]
+	path = qtbase
+	url = git@github.com:qt/qtbase
