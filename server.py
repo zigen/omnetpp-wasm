@@ -109,7 +109,9 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 
-server_address = ('', 8080)
+port = int(sys.argv[1]) if len(sys.argv) == 2 else 8000
+server_address = ('', port)
+print(f"booting server... http://localhost:{port}")
 httpd = HTTPServer(server_address, Handler)
 httpd.serve_forever()
 
