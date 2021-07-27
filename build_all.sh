@@ -1,11 +1,13 @@
 #!/bin/bash
-set -eux
+set -ex
 
 if [ -f "/.dockerenv" ]; then
-bash build_qt.sh
+source ~/.bashrc
+#bash build_qt.sh
 cd /root/omnetpp
-source ./setenv
 cp configure.user.dist.wasm configure.user
+export PATH=/root/omnetpp/bin:$PATH
+export QT_SELECT=5
 emconfigure ./configure
 emmake make -j4 common layout eventlog scave nedxml sim envir utils qtenv
 emmake make -j4 aloha canvas cqn dyna fifo hypercube histograms neddemo queueinglib queueinglibext routing tictoc
