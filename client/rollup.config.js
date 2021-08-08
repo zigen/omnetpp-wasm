@@ -1,23 +1,22 @@
 import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve'
+import css from "rollup-plugin-import-css";
+
 
 export default {
-  input: 'src/main.js',
+  input: {
+   "main": 'src/main.js',
+  },
   output: {
-    file: 'public/bundle.js',
-    format: 'iife',
+    dir: "public/build",
+    format: 'esm',
   },
   plugins: [
     svelte({
       include: 'src/**/*.svelte',
       // Optionally, preprocess components with svelte.preprocess:
       // https://svelte.dev/docs#svelte_preprocess
-      preprocess: {
-        style: ({ content }) => {
-          return transformStyles(content);
-        }
-      },
       emitCss: false,
       onwarn: (warning, handler) => {
         if (warning.code === 'a11y-distracting-elements') return;
@@ -38,5 +37,6 @@ export default {
         "Cross-Origin-Opener-Policy": "same-origin",
       },
     }),
+    css(),
   ]
 }

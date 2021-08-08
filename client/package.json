@@ -11,8 +11,12 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "13.0.4",
     "rollup": "2.55.1",
+    "rollup-plugin-import-css": "3.0.0",
     "rollup-plugin-serve": "1.1.0",
     "rollup-plugin-svelte": "7.1.0",
     "svelte": "3.41.0"
+  },
+  "dependencies": {
+    "ace-builds": "1.4.12"
   }
 }
