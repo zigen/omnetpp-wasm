@@ -1,2 +1,3 @@
 set -eux
-bash build_all.sh
+echo "hello world"
+# bash build_all.sh
