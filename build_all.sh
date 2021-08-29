@@ -4,7 +4,7 @@ set -ex
 if [ -f "/.dockerenv" ]; then
 source ~/.bashrc
 bash build_qt.sh
-cd /root/omnetpp
+cd ~/omnetpp
 cp configure.user.dist.wasm configure.user
 export PATH=/root/omnetpp/bin:$PATH
 export QT_SELECT=5
