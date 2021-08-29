@@ -14,7 +14,7 @@ jobs:
       - run: |
           cp Dockerfile .github/actions/build/
           cp .bashrc .github/actions/build/
-          
+          chmod +x .github/actions/build/entrypoint.sh
       - name: Run a one-line script
         uses: ./.github/actions/build
 
