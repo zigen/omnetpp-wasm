@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, setup-ci ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cp Dockerfile .github/actions/build/
+          cp .bashrc .github/actions/build/
+          
+      - name: Run a one-line script
+        uses: ./.github/actions/build
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
