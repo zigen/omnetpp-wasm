@@ -7,4 +7,3 @@ WORKDIR /root
 RUN apt update && apt install bison flex vim file pkg-config libtool -y
 ADD .bashrc /root/.bashrc
 ADD entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
