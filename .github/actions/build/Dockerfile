@@ -11,4 +11,5 @@ COPY --from=0 /root/omnetpp/lib/* /usr/lib/
 RUN apt update && apt install bison flex vim file pkg-config libtool -y
 ADD .bashrc /github/home/.bashrc
 ADD entrypoint.sh /entrypoint.sh
+RUN echo $HOME
 ENTRYPOINT [ "/entrypoint.sh" ]
