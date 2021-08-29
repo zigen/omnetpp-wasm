@@ -11,5 +11,3 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  run: |
-    bash build_all.sh

@@ -6,9 +6,8 @@ source ~/.bashrc
 bash build_qt.sh
 cd ~/omnetpp
 cp configure.user.dist.wasm configure.user
-export PATH=/root/omnetpp/bin:$PATH
+export PATH=$HOME/omnetpp/bin:$PATH
 export QT_SELECT=5
-ls /root/qtbase/qtbase/bin
 qmake -query
 emconfigure ./configure
 emmake make -j4 common layout eventlog scave nedxml sim envir utils qtenv
