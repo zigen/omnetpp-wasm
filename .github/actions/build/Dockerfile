@@ -6,9 +6,8 @@ FROM emscripten/emsdk:2.0.25
 
 
 WORKDIR /root
-COPY --from=0 /root/omnetpp/bin/ /root/opp_bin
+COPY --from=0 /root/omnetpp/bin/* /usr/local/bin/
 COPY --from=0 /root/omnetpp/lib/* /usr/lib/
 RUN apt update && apt install bison flex vim file pkg-config libtool -y
 ADD entrypoint.sh /entrypoint.sh
-RUN echo $HOME
 ENTRYPOINT [ "/entrypoint.sh" ]
