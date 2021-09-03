@@ -1,1 +1,1 @@
-docker build -t quisp-on-wasm2 .
+docker build -t quisp-on-wasm .

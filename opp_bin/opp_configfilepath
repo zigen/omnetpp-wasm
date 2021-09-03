@@ -1,2 +1,0 @@
-#!/bin/sh
-echo `dirname $0`/../Makefile.inc
