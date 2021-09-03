@@ -14,9 +14,16 @@ jobs:
         with:
           submodules: true
       - run: |
-          cp .bashrc .github/actions/build/
-          rm -rf opp_bin/*
+          echo qtbase_hash=`git ls-tree HEAD qtbase | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
+          echo omnetpp_hash=`git ls-tree HEAD omnetpp | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
+      - uses: actions/cache@v2
+        with:
+          path: qtbase/qtbase
+          key: qtbase-${{ env.qtbase_hash }}-omnetpp-${{ env.omnetpp_hash }}
+      - name: Copy files
+        run: cp .bashrc .github/actions/build/
       - name: Build All
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: ./.github/actions/build
       - name: cache
         run: |
