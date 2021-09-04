@@ -1,5 +1,4 @@
-name: CI
-
+name: build
 on:
   push:
     branches: [ master, setup-ci ]
@@ -10,10 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
-      - run: |
+      - name: Extract submodule hashes
+        run: |
           echo qtbase_hash=`git ls-tree HEAD qtbase | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
           echo omnetpp_hash=`git ls-tree HEAD omnetpp | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
       - name: Copy files
@@ -26,7 +27,26 @@ jobs:
               omnetpp/lib
               omnetpp/Makefile.inc
           key: qtbase-${{ env.qtbase_hash }}-omnetpp-${{ env.omnetpp_hash }}-${{ secrets.CACHE_VERSION }}
-      - name: Build All
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: ./.github/actions/build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: ./Dockerfile
+          tags: docker.pkg.github.com/${{ github.repository }}/my-image:${{ github.ref }}
+          outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: myimage
+          path: /tmp/omnetpp-wasm.tar
+
 

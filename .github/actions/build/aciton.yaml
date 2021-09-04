@@ -1,5 +1,0 @@
-name: 'Docker build'
-description: 'build qtbase and OMNeT++ with emscripten'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
