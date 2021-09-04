@@ -7,6 +7,3 @@
 [submodule "qtbase"]
 	path = qtbase
 	url = git@github.com:qt/qtbase
-[submodule "quisp"]
-	path = quisp
-	url = git@github.com:sfc-aqua/quisp
