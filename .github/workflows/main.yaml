@@ -24,7 +24,8 @@ jobs:
               qtbase/qtbase
               omnetpp/out
               omnetpp/lib
-          key: qtbase-${{ env.qtbase_hash }}-omnetpp-${{ env.omnetpp_hash }}
+              omnetpp/Makefile.inc
+          key: qtbase-${{ env.qtbase_hash }}-omnetpp-${{ env.omnetpp_hash }}-${{ secrets.CACHE_VERSION }}
       - name: Build All
         if: steps.cache.outputs.cache-hit != 'true'
         uses: ./.github/actions/build
