@@ -42,11 +42,11 @@ jobs:
           context: .
           file: ./Dockerfile
           tags: docker.pkg.github.com/${{ github.repository }}/my-image:${{ github.ref }}
-          outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: myimage
-          path: /tmp/omnetpp-wasm.tar
+          # outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: myimage
+      #     path: /tmp/omnetpp-wasm.tar
 
 
