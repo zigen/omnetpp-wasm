@@ -18,7 +18,9 @@ jobs:
           echo omnetpp_hash=`git ls-tree HEAD omnetpp | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
       - uses: actions/cache@v2
         with:
-          path: qtbase/qtbase
+          path: |
+            qtbase/qtbase
+            omnetpp/out
           key: qtbase-${{ env.qtbase_hash }}-omnetpp-${{ env.omnetpp_hash }}
       - name: Copy files
         run: cp .bashrc .github/actions/build/
