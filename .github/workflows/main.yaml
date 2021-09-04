@@ -41,7 +41,7 @@ jobs:
           push: true
           context: .
           file: ./Dockerfile
-          tags: docker.pkg.github.com/${{ github.repository }}/my-image:${{ github.ref }}
+          tags: docker.pkg.github.com/${{ github.repository }}/omnetpp-wasm:${{ github.sha }}
           # outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
       # - name: Upload artifact
       #   uses: actions/upload-artifact@v2
