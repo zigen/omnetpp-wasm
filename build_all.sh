@@ -6,7 +6,7 @@ source ~/.bashrc
 echo "::group::Building Qt"
 bash build_qt.sh
 echo "::endgroup::"
-echo "::group::Building OMNeT++"
+echo "::group::Building OMNeT"
 cd ~/omnetpp
 cp configure.user.dist.wasm configure.user
 export PATH=$HOME/omnetpp/bin:$PATH
@@ -14,7 +14,7 @@ export QT_SELECT=5
 emconfigure ./configure
 emmake make -j4 common layout eventlog scave nedxml sim envir utils qtenv
 echo "::endgroup::"
-echo "::group::Building OMNeT++ Samples"
+echo "::group::Building OMNeT Samples"
 emmake make aloha canvas cqn dyna fifo hypercube histograms neddemo queueinglib queueinglibext routing tictoc
 echo "::endgroup::"
 else
