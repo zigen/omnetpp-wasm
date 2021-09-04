@@ -27,8 +27,4 @@ jobs:
       - name: Build All
         if: steps.cache.outputs.cache-hit != 'true'
         uses: ./.github/actions/build
-      - name: cache
-        run: |
-            ls omnetpp
-            ls omnetpp/out
 
