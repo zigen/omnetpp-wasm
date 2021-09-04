@@ -9,5 +9,6 @@ WORKDIR /root
 COPY --from=0 /root/omnetpp/bin/* /usr/local/bin/
 COPY --from=0 /root/omnetpp/lib/* /usr/lib/
 RUN apt update && apt install bison flex vim file pkg-config libtool -y
-ADD entrypoint.sh /entrypoint.sh
-ENTRYPOINT [ "/entrypoint.sh" ]
+RUN export PATH=$PATH:$HOME/qtbase/qtbase/bin && \
+	mv /usr/local/bin/opp_* ~/omnetpp/bin/ && \
+	bash build_all.sh
