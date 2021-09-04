@@ -1,7 +1,8 @@
 #!/bin/bash
 set -ex
 
-if [ ! -f "/.dockerenv" ]; then
+env
+if [ ! -f "/.dockerenv" ] && [ $PWD != "/root" ] ; then
 docker build -t quisp-on-wasm2 .
 docker run --rm -it --workdir=/root/ -v `pwd`:/root/ quisp-on-wasm2 bash -c "cd /root/ && ./build_all.sh"
 exit $?
