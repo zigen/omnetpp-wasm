@@ -1,12 +1,20 @@
 #!/bin/bash
 set -ex
 
-if [ -f "/.dockerenv" ]; then
+if [ ! -f "/.dockerenv" ]; then
+docker build -t quisp-on-wasm2 .
+docker run --rm -it --workdir=/root/ -v `pwd`:/root/ quisp-on-wasm2 bash -c "cd /root/ && ./build_all.sh"
+exit $?
+fi
+
 source ~/.bashrc
 
 if [ ! -d ~/qtbase/qtbase ]; then
 	echo "::group::Building Qt"
-	bash build_qt.sh
+	cd ~/qtbase
+	./configure -xplatform wasm-emscripten -prefix $PWD/qtbase -opensource -no-compile-examples -confirm-license
+	make -j4
+	make install
 	echo "::endgroup::"
 fi
 
@@ -23,7 +31,8 @@ fi
 
 echo "::group::Building OMNeT Samples"
 cd ~/omnetpp
-TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo queueinglib queueinglibext routing tictoc"
+# TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo queueinglib queueinglibext routing tictoc"
+TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo routing tictoc"
 emmake make $TARGETS
 SAMPLE_OUT=~/sample_outputs
 for target in $TARGETS; do
@@ -35,7 +44,3 @@ for target in $TARGETS; do
 done
 echo "::endgroup::"
 
-else
-docker build -t quisp-on-wasm2 .
-docker run --rm -it --workdir=/root/ -v `pwd`:/root/ quisp-on-wasm2 bash -c "cd /root/ && ./build_all.sh"
-fi
