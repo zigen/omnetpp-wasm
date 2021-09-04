@@ -19,8 +19,8 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: |
-            qtbase/qtbase
-            omnetpp/out
+              qtbase/qtbase
+              omnetpp/out
           key: qtbase-${{ env.qtbase_hash }}-omnetpp-${{ env.omnetpp_hash }}
       - name: Copy files
         run: cp .bashrc .github/actions/build/
@@ -29,6 +29,6 @@ jobs:
         uses: ./.github/actions/build
       - name: cache
         run: |
-          ls omnetpp
-          ls omnetpp/out
+            ls omnetpp
+            ls omnetpp/out
 
