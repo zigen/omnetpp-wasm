@@ -56,7 +56,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: omnetpp-wasm-image
-          path: /tmp/omnetpp-wasm.tar
+          path: /tmp
       -
         name: Load image
         run: |
@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: omnetpp-wasm-image
-          path: /tmp/omnetpp-wasm.tar
+          path: /tmp
       -
         name: Load image
         run: |
