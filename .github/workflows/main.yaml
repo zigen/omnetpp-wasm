@@ -42,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: omnetpp-wasm.tar
+          name: omnetpp-wasm-image
           path: /tmp/omnetpp-wasm.tar
   example-build:
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: omnetpp-wasm.tar
+          name: omnetpp-wasm-image
           path: /tmp/omnetpp-wasm.tar
       -
         name: Load image
@@ -69,7 +69,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: omnetpp-wasm.tar
+          name: omnetpp-wasm-image
           path: /tmp/omnetpp-wasm.tar
       -
         name: Load image
