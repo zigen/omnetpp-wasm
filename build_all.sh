@@ -29,19 +29,3 @@ if [ ! -d ~/omnetpp/lib ]; then
 	emmake make -j4 common layout eventlog scave nedxml sim envir utils qtenv
 	echo "::endgroup::"
 fi
-
-# echo "::group::Building OMNeT Samples"
-# cd ~/omnetpp
-# # TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo queueinglib queueinglibext routing tictoc"
-# TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo routing tictoc"
-# emmake make $TARGETS
-# SAMPLE_OUT=~/sample_outputs
-# for target in $TARGETS; do
-# 	cd ~/omnetpp/samples/$target
-# 	emmake make index.html
-# 	mkdir -p $SAMPLE_OUT/$target
-# 	cd out/emcc-release/
-# 	cp *.js *.wasm *.data qtlogo.svg index.html $SAMPLE_OUT/$target/
-# done
-# echo "::endgroup::"
-
