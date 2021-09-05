@@ -2,13 +2,13 @@
 set -e
 
 echo "::group::Building OMNeT Samples"
-source ~/.bashrc
-cd ~/omnetpp
+WORKDIR=$PWD
+source $WORKDIR/.bashrc
+cd $WORKDIR/omnetpp
 TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo routing tictoc"
-emmake make $TARGETS
-SAMPLE_OUT=~/public
+SAMPLE_OUT=$WORKDIR/public
 for target in $TARGETS; do
-	cd ~/omnetpp/samples/$target
+	cd $WORKDIR/omnetpp/samples/$target
 	emmake make index.html
 	mkdir -p $SAMPLE_OUT/$target
 	cd out/emcc-release/
