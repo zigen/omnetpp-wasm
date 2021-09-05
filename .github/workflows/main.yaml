@@ -1,7 +1,7 @@
 name: build
 on:
   push:
-    branches: [ master, setup-ci ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -36,15 +36,45 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          push: true
           context: .
           file: ./Dockerfile.ci
-          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
-          # outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: myimage
-      #     path: /tmp/omnetpp-wasm.tar
-
+          outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: omnetpp-wasm.tar
+          path: /tmp
+  example-build:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: omnetpp-wasm.tar
+          path: /tmp
+      -
+        name: Load image
+        run: |
+          docker load --input /tmp/omnetpp-wasm.tar
+          docker image ls -a
+  push-to-registry:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: omnetpp-wasm.tar
+          path: /tmp
+      -
+        name: Load image
+        run: |
+          docker load --input /tmp/omnetpp-wasm.tar
+          docker image ls -a
+          
 
