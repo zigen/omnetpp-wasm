@@ -38,6 +38,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.ci
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
           outputs: type=docker,dest=/tmp/omnetpp-wasm.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v2
