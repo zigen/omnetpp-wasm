@@ -41,7 +41,7 @@ jobs:
           docker load --input /tmp/omnetpp-wasm.tar
       - name: Move Cache from image
         run: |
-          docker run -t -v `pwd`:/usr/app ghcr.io/${{ github.repository }}:${{ github.sha }} bash -c "mkdir /usr/app/omnetpp /usr/app/qtbase && cp -R omnetpp/out omnetpp/lib omnetpp/Makefile.inc /usr/app/omnetpp/ && cp -R qtbase/qtbase /usr/app/qtbase/"
+          docker run -t -v `pwd`:/usr/app ghcr.io/${{ github.repository }}:${{ github.sha }} bash -c "cp -R omnetpp/out omnetpp/lib omnetpp/Makefile.inc /usr/app/omnetpp/ && cp -R qtbase/qtbase /usr/app/qtbase/"
           ls -la
       - name: Upload artifact
         uses: actions/upload-artifact@v2
