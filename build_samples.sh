@@ -9,7 +9,7 @@ TARGETS="aloha canvas cqn dyna fifo hypercube histograms neddemo routing tictoc"
 SAMPLE_OUT=$WORKDIR/public
 for target in $TARGETS; do
 	cd $WORKDIR/omnetpp/samples/$target
-	opp_makemake
+	opp_makemake -f -M release
 	emmake make index.html
 	mkdir -p $SAMPLE_OUT/$target
 	cd out/emcc-release/
