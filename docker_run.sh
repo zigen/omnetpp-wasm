@@ -1,1 +1,1 @@
-docker run --rm -it --workdir=/root/ -v `pwd`:/root/ quisp-on-wasm bash
+docker run --rm -it --workdir=/root/ -v `pwd`:/root/ omnetpp-wasm bash
