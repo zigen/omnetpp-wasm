@@ -50,9 +50,9 @@ def gen_post_js(config):
     ned_folders = ["-n", ":".join(config.get("ned-folders", ["."]))]
     opp_env = config.get("ui", "Qtenv")
     ini_file = ["-f", config["ini-file"]]
-    code = f"""
-		arguments_ = [{wrap_with_double_quote(["-m", "-u", opp_env] + config_args + ned_folders + ini_file)}];
-	"""
+    code = f"""arguments_ = [{wrap_with_double_quote(["-m", "-u", opp_env] + config_args + ned_folders + ini_file)}];"""
+    with open("/root/FileExplorer.js", "r") as f:
+        code += f.read()
     print(code)
     with open("post.js", "w") as f:
         f.write(code)
@@ -81,4 +81,4 @@ for file in config["ned-files"] + [
 files_str = " ".join(files)
 gen_post_js(config)
 subprocess.run(["opp_makemake", "-f", "-M", "release", "--deep", "-i", "./makefrag"])
-subprocess.run(["emmake", "make", "index.html", f'PRELOAD_FILES={files_str}'])
+subprocess.run(["emmake", "make", "index.html", f"PRELOAD_FILES={files_str}"])
