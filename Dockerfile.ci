@@ -12,7 +12,6 @@ RUN apt update && apt install bison flex vim file pkg-config libtool -y && pip3 
 ADD . /root/
 RUN export PATH=$PATH:$HOME/qtbase/qtbase/bin && \
 	mkdir -p ~/omnetpp/bin && \
-	mv /usr/local/bin/opp_* ~/omnetpp/bin/ && \
 	ln -s /usr/bin/python3 /usr/bin/python && \
 	bash build_all.sh && \
 	cd ~/omnetpp && rm -rf src ui test samples releng out && \
