@@ -1,50 +1,97 @@
-// name = "\"Example_run\""; url = URL.createObjectURL(new Blob([FS.readFile(name,{encoding: "utf8"})], {type: "application/text"})); name.replace("/", "_"); a = document.createElement("a"); a.href = url; a.setAttribute("download", name); a.textContent = name; document.body.appendChild(a); a.style.position = "fixed"; a.style.bottom = 0;a.style.backgroundColor = "white"
+
+const styles = [];
 const main = () => {
 	const panel = createFileExplorerPanel();
-	const fileList = createFileViewer();
+	const fileList = createFileExplorer();
 	panel.content.appendChild(fileList);
 	const viewer = createFileViewerPanel();
 	document.body.appendChild(viewer);
 	fileList.onSelect = viewer.open;
+	applyCSS();
 };
 
+styles.push(`
+.panel {
+	position: fixed;
+	background-color: white;
+	overflow: scroll;
+	padding: 0.2rem 0.5rem;
+	border: 1px solid black;
+	max-height: 80vh;
+	max-width: 60vw;
+}
+.panel-header {
+	display: flex;
+	justify-content: space-between;
+	position: fixed;
+}
+.file-viewer .panel-header {
+	width: 60vw;
+}
+.file-viewer {
+	top: 10vh;
+	left: 20vw;
+	width: 60vw;
+	overflow: scroll;
+}
+.file-viewer .close-button {
+	content: "x";
+	cursor: pointer;
+}
+.file-viewer .content {
+	white-space: pre;
+	font-family: monospace;
+	margin-top: 2rem;
+}
+`);
+
+const createElement = (tagName, className, textContent) => {
+	const e = document.createElement(tagName);
+	if (className) e.className = className;
+	if (textContent) e.textContent = textContent;
+	return e;
+}
 const createFileViewerPanel = () => {
 	let isOpen = false;
-	const panel = document.createElement("DIV");
-	panel.className = "panel";
-	panel.style.position = "fixed";
-	panel.style.backgroundColor = "white";
-	panel.style.top = "10vh";
-	panel.style.left = "30vw";
-	panel.style.padding = "0.2rem 0.5rem";
-	panel.style.border = "1px solid black";
-	panel.style.maxHeight = "80vh";
-	panel.style.maxWidth = "60vw";
-	panel.style.overflow = "scroll";
-	const panelTitle = document.createElement("DIV");
-	panelTitle.style.cursor = "pointer";
-	const content = document.createElement("DIV");
-	content.className = "content";
-	content.style.whiteSpace = "pre";
-	content.style.fontFamily = "monospace";
+	let currentFilePath = null;
+	const panel = createElement("DIV", "panel file-viewer");
+
+	const panelHeader = createElement("DIV", "panel-header");
+	const closeButton = createElement("BUTTON", "close-button","x");
+	const panelTitle = createElement("DIV");
+	const actions = createElement("DIV", "actions-container");
+	const actionButton = createElement("BUTTON", "action-button");
+	const downloadLink = createElement("A", "download-link", "download");
+	downloadLink.onmouseenter = () => {
+		console.log("hover",currentFilePath );
+		downloadLink.href = URL.createObjectURL(new Blob([FS.readFile(currentFilePath,{encoding: "utf8"})], {type: "application/text"}));
+		downloadLink.setAttribute("download", PATH.basename(currentFilePath));
+	}
+	actions.appendChild(actionButton);
+	actions.appendChild(downloadLink);
+	const content = createElement("DIV", "content");
 	panel.content = content;
 
 	const updatePanel = () => {
 		panel.style.display = isOpen ? "block" : "none";
 	}
-	panelTitle.onclick = () => {
+	closeButton.onclick = () => {
 		isOpen = !isOpen;
 		updatePanel();
 	}
+	panelHeader.appendChild(closeButton);
+	panelHeader.appendChild(panelTitle);
+	panelHeader.appendChild(actions);
 
-	panel.appendChild(panelTitle);
+	panel.appendChild(panelHeader);
 	panel.appendChild(content);
 	document.body.appendChild(panel);
 	updatePanel();
 	panel.open = (path) => {
 		isOpen = true;
 		const contentStr = FS.readFile(path, {encoding: "utf8"});
-		panelTitle.textContent =  "x   " + path;
+		panelTitle.textContent = path;
+		currentFilePath = path;
 
 		content.textContent = contentStr;
 		updatePanel();
@@ -52,16 +99,15 @@ const createFileViewerPanel = () => {
 	return panel;
 }
 
-const createFileViewer = () => {
+const createFileExplorer = () => {
 	let currentPath = "/"
 	let dirs = [];
 	const listElem = document.createElement("UL");
-	const twodot = document.createElement("LI");
-	twodot.textContent = "..";
+	const twodot = createElement("LI", "", "..");
 	twodot.onclick = () => updateCurrentPath(PATH.join(currentPath, ".."));
 
 	const updateCurrentPath = (newPath) => {
-			twodot.style.display = newPath === "/" ? "none" : "block";
+			twodot.style.display = newPath === "/" ? "none" : "list-item";
 
 		const newDirs = readDir(newPath);
 		const elemsToBeRemoved = dirs.filter(e => !newDirs.includes(e));
@@ -100,24 +146,23 @@ const createFileViewer = () => {
 	return listElem;
 }
 
+styles.push(`
+.file-explorer {
+	bottom: 0;
+	right: 0;
+}
+`);
 const createFileExplorerPanel = () => {
 	let isOpen = false;
-	const panel = document.createElement("DIV");
-	panel.className = "panel";
-	panel.style.position = "fixed";
-	panel.style.backgroundColor = "white";
-	panel.style.bottom = 0;
-	panel.style.right = 0;
-	panel.style.padding = "0.2rem 0.5rem";
-	panel.style.border = "1px solid black";
+	const panel = createElement("DIV", "panel file-explorer");
 	const panelTitle = document.createElement("DIV");
 	panelTitle.style.cursor = "pointer";
-	const content = document.createElement("DIV");
-	content.className = "content";
+	const content = createElement("DIV", "content");
 	panel.content = content;
 
 	const updatePanel = () => {
 		panel.style.height = isOpen ? "auto" : "1.5rem";
+		panel.style.overflow = isOpen ? "scroll" : "auto";
 		panelTitle.textContent = isOpen ? "x" : "File Explorer";
 		content.style.display = isOpen ? "block" : "none";
 	}
@@ -139,4 +184,9 @@ const createId = (workingDir, name) =>  (workingDir + "-" +  name)
 	.replaceAll("#", "sharp");
 EXCLEDED_DIR =  [".", "..", "home", "tmp", "dev", "proc", "images"];
 const readDir = (path) => FS.readdir(path).filter(e => !EXCLEDED_DIR.includes(e));
+const applyCSS = () => {
+	const elem = document.createElement("STYLE");
+	elem.textContent = styles.join("\n");
+	document.body.appendChild(elem);
+};
 main();
