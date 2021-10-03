@@ -1,0 +1,13 @@
+name: 'OMNeT++ Wasm Builder'
+description: 'Build your OMNeT++ simulation model for WebAssembly'
+inputs:
+  config-file:
+    description: 'your build.toml file path'
+    required: false
+    default: './build.toml'
+runs:
+  using: 'docker'
+  image: 'ghcr.io/zigen/omnetpp-wasm:latest'
+  entrypoint: './entrypoint.sh'
+  args:
+    - ${{ inputs.config-file }}
