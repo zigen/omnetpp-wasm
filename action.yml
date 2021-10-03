@@ -8,6 +8,6 @@ inputs:
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/zigen/omnetpp-wasm:latest'
-  entrypoint: './entrypoint.sh'
+  entrypoint: '/root/entrypoint.sh'
   args:
     - ${{ inputs.config-file }}
