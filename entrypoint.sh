@@ -1,3 +1,3 @@
 #!/bin/bash
 echo $1
-python3 build.py -f $1
+python3 /root/build.py -f $1
