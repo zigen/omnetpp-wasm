@@ -7,7 +7,7 @@ inputs:
     default: './build.toml'
 runs:
   using: 'docker'
-  image: 'ghcr.io/zigen/omnetpp-wasm:latest'
+  image: 'docker://ghcr.io/zigen/omnetpp-wasm:latest'
   entrypoint: './entrypoint.sh'
   args:
     - ${{ inputs.config-file }}
