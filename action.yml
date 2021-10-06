@@ -4,7 +4,7 @@ inputs:
   config-file:
     description: 'your build.toml file path'
     required: false
-    default: './build.toml'
+    default: '/github/workspace/build.toml'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/zigen/omnetpp-wasm:latest'
