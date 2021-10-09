@@ -23,6 +23,7 @@ if [ ! -d ~/omnetpp/lib/liboppqtenv.a ]; then
 	echo "::group::Building OMNeT"
 	cd ~/omnetpp
 	cp configure.user.dist.wasm configure.user
+ 	cp /usr/local/bin/opp_* /root/omnetpp/bin/
 	ln -sf /usr/bin/python3 /usr/bin/python 
 	export PATH=$HOME/omnetpp/bin:$PATH
 	export QT_SELECT=5

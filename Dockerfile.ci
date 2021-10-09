@@ -15,4 +15,5 @@ RUN export PATH=$PATH:$HOME/qtbase/qtbase/bin && \
 	ln -s /usr/bin/python3 /usr/bin/python && \
 	bash build_all.sh && \
 	cd ~/omnetpp && rm -rf src ui test samples releng out && \
-	cd ~/qtbase && rm -rf examples src tests util
+	cd ~/qtbase && rm -rf examples src tests util && \
+	echo "#/bin/sh\necho /root/omnetpp/Makefile.inc" > /usr/local/bin/opp_configfilepath
