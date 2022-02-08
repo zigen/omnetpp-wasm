@@ -35,6 +35,8 @@ def parse_config():
             [],
         )
     )
+    if "images" not in config:
+        config["images"] = []
     print(config)
     return config
 
@@ -71,7 +73,7 @@ WASM_OPTS = '--bind -s ASYNCIFY=1 -s USE_PTHREADS=0 -s PTHREAD_POOL_SIZE=1 -s TO
 
 files = []
 
-for file in config["ned-files"] + [
+for file in config["ned-files"] + config["images"] + [
     "/root/omnetpp/images@images",
     "/root/wasm-qtenvrc@.qtenvrc",
     config["ini-file"],

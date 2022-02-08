@@ -5,7 +5,11 @@ ned-folders = [
 	"./networks",
 	"./channels",
 	"./modules"
-] 
+]
+# image directories
+images = [
+	"./images"	
+]
 ini-file = "./networks/omnetpp.ini"
 project-folder = "./quisp"
 output-folder = "./wasm-out"
