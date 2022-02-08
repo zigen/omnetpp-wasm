@@ -1,9 +1,38 @@
-FROM omnetpp/omnetpp:u18.04-5.6.2
+FROM ubuntu:20.04
 
-# FROM trzeci/emscripten:1.38.48-fastcomp
-#FROM trzeci/emscripten:sdk-tag-1.38.30-64bit
+ARG DEBIAN_FRONTEND=noninteractive
+ARG VERSION=5.7
+RUN apt update -y && apt install -y --no-install-recommends \
+    qt5-default libqt5opengl5-dev libgtk-3-0 default-jre osgearth \
+    libeigen3-dev cmake g++ gdb gpg-agent software-properties-common wget \
+    vim bison flex make lld-12 git clang-format-12 clang-tidy-12 lldb-12 && \
+    ln -s /usr/bin/clang-format-12 /usr/bin/clang-format && \
+    ln -s /usr/bin/clang-tidy-12 /usr/bin/clang-tidy && \
+    ln -sf /usr/bin/clang-12 /usr/bin/clang && \
+    ln -sf /usr/bin/clang++-12 /usr/bin/clang++ && \
+    ln -sf /usr/bin/llvm-profdata-12 /usr/bin/llvm-profdata && \
+    ln -sf /usr/bin/llvm-cov-12 /usr/bin/llvm-cov && \
+    ln -sf /usr/bin/lld-12 /usr/bin/lld
+
+WORKDIR /root
+RUN wget https://github.com/omnetpp/omnetpp/releases/download/omnetpp-$VERSION/omnetpp-$VERSION-linux-x86_64.tgz \
+    --referer=https://omnetpp.org/ -O omnetpp-src-linux.tgz --progress=dot:giga && \
+    tar xf omnetpp-src-linux.tgz && rm omnetpp-src-linux.tgz
+RUN mv omnetpp-$VERSION omnetpp
+WORKDIR /root/omnetpp
+ENV PATH /root/omnetpp/bin:$PATH
+ENV QT_LOGGING_RULES=*.debug=false;qt.qpa.*=false
+ENV OMNETPP_RELEASE=omnetpp-$VERSION
+RUN bash -c "source setenv && ./configure WITH_OSG=no && \
+    make -j $(nproc) MODE=debug base && \
+    make -j $(nproc) MODE=release base && \
+    rm -r doc out test samples config.log config.status"
 FROM emscripten/emsdk:2.0.25
-
+ARG VERSION=5.7
+ENV PATH /root/omnetpp/bin:$PATH
+ENV QT_LOGGING_RULES=*.debug=false;qt.qpa.*=false
+ENV OMNETPP_RELEASE=omnetpp-$VERSION
+ENV QT_SELECT=5
 
 WORKDIR /root
 COPY --from=0 /root/omnetpp/bin/* /usr/local/bin/

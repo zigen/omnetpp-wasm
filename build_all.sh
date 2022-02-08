@@ -25,9 +25,12 @@ if [ ! -d ~/omnetpp/lib/liboppqtenv.a ]; then
 	cp configure.user.dist.wasm configure.user
  	cp /usr/local/bin/opp_* /root/omnetpp/bin/
 	ln -sf /usr/bin/python3 /usr/bin/python 
-	export PATH=$HOME/omnetpp/bin:$PATH
-	export QT_SELECT=5
+	source setenv
+	# make clean -j4
 	emconfigure ./configure
-	emmake make -j4 common layout eventlog scave nedxml sim envir utils qtenv cmdenv
+	emmake make -j4 common
+	emmake make -j4 layout eventlog 
+	emmake make -j4 scave nedxml sim envir utils 
+	emmake make -j4 qtenv cmdenv
 	echo "::endgroup::"
 fi
