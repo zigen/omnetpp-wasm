@@ -13,6 +13,6 @@ for target in $TARGETS; do
 	emmake make index.html
 	mkdir -p $SAMPLE_OUT/$target
 	cd out/emcc-release/
-	cp *.js *.wasm *.data qtlogo.svg index.html $SAMPLE_OUT/$target/
+	cp *.js *.wasm *.data qtlogo.svg index.html $target $SAMPLE_OUT/$target/
 done
 echo "::endgroup::"
