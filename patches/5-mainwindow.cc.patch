@@ -1,0 +1,46 @@
+diff --git a/src/qtenv/mainwindow.cc b/src/qtenv/mainwindow.cc
+index de6271f513..7ae9639e7a 100644
+--- a/src/qtenv/mainwindow.cc
++++ b/src/qtenv/mainwindow.cc
+@@ -57,6 +57,8 @@
+ #include "videorecordingdialog.h"
+ #include "qtutil.h"
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ using namespace omnetpp::common;
+@@ -556,20 +558,19 @@ void MainWindow::on_actionSetUpConfiguration_triggered()
+ 
+     cConfigurationEx *configEx = getQtenv()->getConfigEx();
+ 
+-    // No filter used for subsequent run selections.
+-    // Note that if invoked this way, we pretty much avoid all possibility of an exception,
+-    // because the run filter is constant, and the config name is the current one, so it must exist.
+-    // This, and the fact that Qtenv::displayException is protected, along with Qt not supporting
+-    // throwing exceptions from slots, justifies the omission of a try-catch block.
+-    // It would only be an ASSERT(false) or something similar anyway.
+-    RunSelectionDialog dialog(configEx, configEx->getActiveConfigName(), "", this);
+-    if (dialog.exec()) {
+-        busy("Setting up new run...");
+-        emit setNewNetwork();
+-        env->newRun(dialog.getConfigName().c_str(), dialog.getRunNumber());
+-        busy();
+-        reflectConfigOnUi();
++    auto *dialog = new RunSelectionDialog(configEx, configEx->getActiveConfigName(), "", this);
++    bool accepted = false;
++    connect(dialog, &RunSelectionDialog::accepted, [&](){ accepted = true; });
++    dialog->open();
++    while(!accepted) {
++        emscripten_sleep(10);
+     }
++    busy("Setting up new run...");
++    emit setNewNetwork();
++    env->newRun(dialog->getConfigName().c_str(), dialog->getRunNumber());
++    busy();
++    // reflectRecordEventlog();
++    return;
+ }
+ 
+ // runUntil
