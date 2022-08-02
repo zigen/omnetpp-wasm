@@ -1,0 +1,65 @@
+diff --git a/Makefile.inc.in b/Makefile.inc.in
+index fe9fcd8210..3929751092 100644
+--- a/Makefile.inc.in
++++ b/Makefile.inc.in
+@@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
+ IMPDEF_SUFFIX = @IMPDEF_SUFFIX@
+ SHARED_LIB_SUFFIX = @SHARED_LIB_SUFFIX@
+ JNI_LIB_SUFFIX = @JNI_LIB_SUFFIX@
+-EXE_SUFFIX = @EXE_SUFFIX@
++EXE_SUFFIX = .html
+ LIB_PREFIX = @LIB_PREFIX@
+ 
+ #
+@@ -199,6 +199,51 @@ ALL_ENV_LIBS = $(CMDENV_LIBS)
+ KERNEL_LIBS = -loppsim$D
+ OPPMAIN_LIB = $(LDFLAG_LIB)oppmain$D
+ 
++#
++# for web assembly
++#
++ifneq ($(EMSCRIPTEN),) 
++  SHARED_LIBS=no
++  BUILDING_UILIBS=no
++  WITH_TKENV=no
++  WITH_OSG=no
++  WITH_OSGEARTH=no
++  WITH_PARSIM=no
++  ARFLAG_OUT= qcs 
++  WHOLE_ARCHIVE_ON = -Wl,--whole-archive
++  WHOLE_ARCHIVE_OFF =
++  EXE_SUFFIX = .js
++  CFLAGS_DEBUG+= -gsource-map -g3 -O0 --source-map-base http://localhost:8080/
++  CFLAGS_RELEASE+= -O3 -Os
++  PRELOAD_FILES ?= --preload-file .
++  CFLAGS+= -s DISABLE_EXCEPTION_CATCHING=0 -s USE_PTHREADS=0
++  LDFLAGS+= --bind -s ASYNCIFY=1 -s USE_PTHREADS=0 -s PTHREAD_POOL_SIZE=1 -s TOTAL_MEMORY=1GB -s WASM=1 -s FULL_ES2=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=0  -s EXPORTED_RUNTIME_METHODS=["UTF16ToString","stringToUTF16","ccall","cwrap"] $(PRELOAD_FILES) --preload-file /root/omnetpp/images@images --preload-file /root/wasm-qtenvrc@.qtenvrc -s DISABLE_EXCEPTION_CATCHING=0 
++  ifeq ($(MODE),debug)
++    LDFLAGS += -O3 -Os  -s ASSERTIONS=2 -s SAFE_HEAP=1 -s EXCEPTION_DEBUG=0
++    #LDFLAGS += -gsource-map -g3 -O0 --source-map-base http://localhost:8080/ -s ASSERTIONS=2 -s SAFE_HEAP=1 -s EXCEPTION_DEBUG=0
++  else
++    LDFLAGS += -O3 -Os
++  endif
++  ifneq (,$(wildcard $(CURDIR)/post.js))
++    LDFLAGS += --post-js ./post.js
++  endif
++
++default: all
++
++index.html: $O/$(TARGET)
++	echo $O/$(TARGET)
++	cp /root/qtbase/qtbase/plugins/platforms/wasm_shell.html $O/index.html
++	cp /root/qtbase/qtbase/plugins/platforms/qtloader.js $O/qtloader.js
++	cp /root/qtbase/qtbase/plugins/platforms/qtlogo.svg $O/qtlogo.svg
++	cp /root/node_exec_template.js $O/$(TARGET:.js=)
++	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/index.html
++	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/qtloader.js
++	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/$(TARGET:.js=)
++
++%.js: index.html
++
++endif
++
+ #
+ # flags and libraries required for Qtenv
+ #

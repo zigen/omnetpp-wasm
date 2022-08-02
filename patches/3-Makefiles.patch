@@ -1,0 +1,64 @@
+diff --git a/src/eventlog/Makefile b/src/eventlog/Makefile
+index f0012bec8a..1a823cfed5 100644
+--- a/src/eventlog/Makefile
++++ b/src/eventlog/Makefile
+@@ -65,7 +65,7 @@ $O/%.o: %.cc $(GENERATED_SOURCES) $(CONFIGFILE) $(COPTS_FILE)
+ #
+ # Targets
+ #
+-all : $(TARGET_LIB_FILES) $(TARGET_EXE_FILES)
++all : $(TARGET_LIB_FILES)
+ 
+ ifeq ($(SHARED_LIBS),yes)
+ # dynamically linked library (on all platforms except Windows)
+diff --git a/src/nedxml/Makefile b/src/nedxml/Makefile
+index 3875f341bf..a0f9dc3d8f 100644
+--- a/src/nedxml/Makefile
++++ b/src/nedxml/Makefile
+@@ -81,7 +81,7 @@ $O/%.o: %.cc $(GENERATED_SOURCES) $(CONFIGFILE) $(COPTS_FILE)
+ #
+ # Targets
+ #
+-all : $(TARGET_LIB_FILES) $(TARGET_EXE_FILES)
++all : $(TARGET_LIB_FILES)
+ 
+ ifeq ($(SHARED_LIBS),yes)
+ # dynamically linked library (on all platforms except Windows)
+diff --git a/src/scave/Makefile b/src/scave/Makefile
+index 94447d14b2..8c6952d93f 100644
+--- a/src/scave/Makefile
++++ b/src/scave/Makefile
+@@ -75,7 +75,7 @@ $O/%.o: %.cc $(GENERATED_SOURCES) $(CONFIGFILE) $(COPTS_FILE)
+ #
+ # Targets
+ #
+-all : $(TARGET_LIB_FILES) $(TARGET_EXE_FILES)
++all : $(TARGET_LIB_FILES)
+ 
+ ifeq ($(SHARED_LIBS),yes)
+ # dynamically linked library (on all platforms except Windows)
+diff --git a/src/utils/Makefile b/src/utils/Makefile
+index b03cf981c0..24191c3ec5 100644
+--- a/src/utils/Makefile
++++ b/src/utils/Makefile
+@@ -16,19 +16,7 @@ L=$(OMNETPP_LIB_DIR)
+ # Rules
+ #
+ all: $(CONFIGFILE)
+-	$(Q)echo "#!/bin/sh" >$(OMNETPP_BIN_DIR)/opp_configfilepath && echo '(cd $$(dirname $$0)/.. && echo $$(pwd)/Makefile.inc)' >>$(OMNETPP_BIN_DIR)/opp_configfilepath
+-	$(Q)cp opp_makemake $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_featuretool $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_charttool $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_test $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_fingerprinttest $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_shlib_postprocess $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_runall $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_neddoc $(OMNETPP_BIN_DIR)
+-	$(Q)cp opp_ide $(OMNETPP_BIN_DIR)
+-	$(Q)cp omnetpp $(OMNETPP_BIN_DIR)
+-	$(Q)cp omnest $(OMNETPP_BIN_DIR)
+-	$(Q)chmod +x $(OMNETPP_BIN_DIR)/opp_makemake $(OMNETPP_BIN_DIR)/opp_test $(OMNETPP_BIN_DIR)/opp_fingerprinttest $(OMNETPP_BIN_DIR)/opp_configfilepath $(OMNETPP_BIN_DIR)/opp_shlib_postprocess $(OMNETPP_BIN_DIR)/opp_runall $(OMNETPP_BIN_DIR)/opp_neddoc $(OMNETPP_BIN_DIR)/opp_ide $(OMNETPP_BIN_DIR)/omnetpp $(OMNETPP_BIN_DIR)/omnest
++	echo "skip"
+ 
+ clean:
+ 	$(qecho) Cleaning utils
