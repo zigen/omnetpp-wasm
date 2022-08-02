@@ -1,5 +1,5 @@
 diff --git a/Makefile.inc.in b/Makefile.inc.in
-index fe9fcd8210..3929751092 100644
+index fe9fcd8210..8702a09d9f 100644
 --- a/Makefile.inc.in
 +++ b/Makefile.inc.in
 @@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
@@ -11,7 +11,7 @@ index fe9fcd8210..3929751092 100644
  LIB_PREFIX = @LIB_PREFIX@
  
  #
-@@ -199,6 +199,51 @@ ALL_ENV_LIBS = $(CMDENV_LIBS)
+@@ -199,6 +199,52 @@ ALL_ENV_LIBS = $(CMDENV_LIBS)
  KERNEL_LIBS = -loppsim$D
  OPPMAIN_LIB = $(LDFLAG_LIB)oppmain$D
  
@@ -25,7 +25,8 @@ index fe9fcd8210..3929751092 100644
 +  WITH_OSG=no
 +  WITH_OSGEARTH=no
 +  WITH_PARSIM=no
-+  ARFLAG_OUT= qcs 
++  ARFLAG_OUT=qcs  
++  AR_CS=
 +  WHOLE_ARCHIVE_ON = -Wl,--whole-archive
 +  WHOLE_ARCHIVE_OFF =
 +  EXE_SUFFIX = .js
