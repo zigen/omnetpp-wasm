@@ -21,8 +21,9 @@ fi
 
 if [ ! -d ~/omnetpp/lib/liboppqtenv.a ]; then
 	echo "::group::Building OMNeT"
+	./apply_patches.sh
 	cd ~/omnetpp
-	cp configure.user.dist.wasm configure.user
+	# cp configure.user.dist.wasm configure.user
  	cp /usr/local/bin/opp_* /root/omnetpp/bin/
 	ln -sf /usr/bin/python3 /usr/bin/python 
 	source setenv

@@ -1,5 +1,5 @@
 diff --git a/Makefile.inc.in b/Makefile.inc.in
-index fe9fcd8210..8702a09d9f 100644
+index fe9fcd8210..5cb86d02fc 100644
 --- a/Makefile.inc.in
 +++ b/Makefile.inc.in
 @@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
@@ -11,13 +11,29 @@ index fe9fcd8210..8702a09d9f 100644
  LIB_PREFIX = @LIB_PREFIX@
  
  #
-@@ -199,6 +199,52 @@ ALL_ENV_LIBS = $(CMDENV_LIBS)
- KERNEL_LIBS = -loppsim$D
+@@ -200,26 +200,58 @@ KERNEL_LIBS = -loppsim$D
  OPPMAIN_LIB = $(LDFLAG_LIB)oppmain$D
  
-+#
+ #
+-# flags and libraries required for Qtenv
 +# for web assembly
-+#
+ #
+-ifeq ($(WITH_QTENV),yes)
+-  DEFINES += -DWITH_QTENV
+-  # libraries required for static linking
+-  ifneq ($(SHARED_LIBS),yes)
+-    QTENV_LIBS += $(QT_LIBS)
+-    ifeq ($(WITH_OSG),yes)
+-      QTENV_LIBS += $(OSG_LIBS)
+-      KERNEL_LIBS += -losg -lOpenThreads
+-    endif
+-    ifeq ($(WITH_OSGEARTH),yes)
+-      QTENV_LIBS += $(OSGEARTH_LIBS)
+-      KERNEL_LIBS += -losgEarth
+-    endif
+-    ifeq ($(PLATFORM),macos)
+-      QTENV_LIBS += -framework Carbon
+-    endif
 +ifneq ($(EMSCRIPTEN),) 
 +  SHARED_LIBS=no
 +  BUILDING_UILIBS=no
@@ -25,8 +41,8 @@ index fe9fcd8210..8702a09d9f 100644
 +  WITH_OSG=no
 +  WITH_OSGEARTH=no
 +  WITH_PARSIM=no
-+  ARFLAG_OUT=qcs  
-+  AR_CS=
++  ARFLAG_OUT=
++  AR_CR=/emsdk/upstream/emscripten/emar cr 
 +  WHOLE_ARCHIVE_ON = -Wl,--whole-archive
 +  WHOLE_ARCHIVE_OFF =
 +  EXE_SUFFIX = .js
@@ -43,7 +59,8 @@ index fe9fcd8210..8702a09d9f 100644
 +  endif
 +  ifneq (,$(wildcard $(CURDIR)/post.js))
 +    LDFLAGS += --post-js ./post.js
-+  endif
+   endif
+-  ALL_ENV_LIBS += $(QTENV_LIBS)
 +
 +default: all
 +
@@ -61,6 +78,13 @@ index fe9fcd8210..8702a09d9f 100644
 +
 +endif
 +
- #
- # flags and libraries required for Qtenv
++#
++# flags and libraries required for Qtenv
++#
++ifneq ($(EMSCRIPTEN),) 
++  QTENV_LIBS = -L/root/qtbase/qtbase/lib -L/root/qtbase/qtbase/plugins/platforms -L/root/qtbase/qtbase/plugins/imageformats/ -lqwasm -lQt5Gui -lQt5Core -lQt5Widgets -lQt5PrintSupport -lQt5OpenGL -lQt5EventDispatcherSupport -lQt5FontDatabaseSupport -lqtfreetype -lqgif  -lqtpcre2 -lqtlibpng -lqtharfbuzz -lqjpeg -lqico -loppqtenv$D -loppenvir$D -lopplayout$D
++  QTENV_LDFLAGS = 
++  ALL_ENV_LIBS = $(QTENV_LIBS) -loppcmdenv$D
+ endif
+ 
  #
