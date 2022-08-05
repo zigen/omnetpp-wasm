@@ -21,6 +21,7 @@ fi
 
 if [ ! -d ~/omnetpp/lib/liboppqtenv.a ]; then
 	echo "::group::Building OMNeT"
+	cd ~/
 	./apply_patches.sh
 	cd ~/omnetpp
 	# cp configure.user.dist.wasm configure.user
