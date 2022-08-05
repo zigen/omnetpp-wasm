@@ -1,14 +1,118 @@
-From c4fbb29323f0166341b912b0f927601527c9a66d Mon Sep 17 00:00:00 2001
+From 25d9f2cc2ef37b75e35db02d63447a37e4e66394 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:51:11 +0900
 Subject: [PATCH 3/3] stop creating new main loop
 
 because wasm runs in single thread environment
 ---
- src/qtenv/mainwindow.cc | 27 ++++++++++++++-------------
- src/qtenv/qtenv.cc      | 35 ++++++++++++++++-------------------
- 2 files changed, 30 insertions(+), 32 deletions(-)
+ src/qtenv/canvasinspector.cc         |  8 ++++++-
+ src/qtenv/displayupdatecontroller.cc |  3 +++
+ src/qtenv/genericobjectinspector.cc  |  6 ++++-
+ src/qtenv/loginspector.cc            |  7 +++++-
+ src/qtenv/mainwindow.cc              | 27 ++++++++++-----------
+ src/qtenv/moduleinspector.cc         |  7 +++++-
+ src/qtenv/objectlistview.cc          |  7 +++++-
+ src/qtenv/objecttreeinspector.cc     |  7 +++++-
+ src/qtenv/qtenv.cc                   | 35 +++++++++++++---------------
+ src/qtenv/timelineinspector.cc       | 12 ++++++++--
+ 10 files changed, 79 insertions(+), 40 deletions(-)
 
+diff --git a/src/qtenv/canvasinspector.cc b/src/qtenv/canvasinspector.cc
+index 9e225b37a7..4ecf8a886c 100644
+--- a/src/qtenv/canvasinspector.cc
++++ b/src/qtenv/canvasinspector.cc
+@@ -36,6 +36,8 @@
+ #include <QtCore/QDebug>
+ #include <QtWidgets/QScrollBar>
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ using namespace omnetpp::common;
+@@ -195,7 +197,11 @@ void CanvasInspector::onContextMenuRequested(QContextMenuEvent *event)
+         menu->addAction("Zoom In", this, SLOT(zoomIn()), QKeySequence(Qt::CTRL + Qt::Key_Plus));
+         menu->addAction("Zoom Out", this, SLOT(zoomOut()), QKeySequence(Qt::CTRL + Qt::Key_Minus));
+ 
+-        menu->exec(event->globalPos());
++        menu->popup(event->globalPos());
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++        while(!triggered) emscripten_sleep(10);
++
+         delete menu;
+     }
+ }
+diff --git a/src/qtenv/displayupdatecontroller.cc b/src/qtenv/displayupdatecontroller.cc
+index 754c51319f..c655a08240 100644
+--- a/src/qtenv/displayupdatecontroller.cc
++++ b/src/qtenv/displayupdatecontroller.cc
+@@ -30,6 +30,8 @@
+ #include "common/fileutil.h"
+ #include "envir/speedometer.h"
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ namespace omnetpp {
+@@ -579,6 +581,7 @@ void DisplayUpdateController::renderFrame(bool record)
+     qtenv->refreshInspectors();
+ 
+     QApplication::processEvents();
++    emscripten_sleep(-1);
+ 
+     lastGuiUpdateAt = now;
+     lastFrameAt = now;
+diff --git a/src/qtenv/genericobjectinspector.cc b/src/qtenv/genericobjectinspector.cc
+index 68020e1f68..9ee305e78b 100644
+--- a/src/qtenv/genericobjectinspector.cc
++++ b/src/qtenv/genericobjectinspector.cc
+@@ -40,6 +40,7 @@
+ #include <QtWidgets/QMessageBox>
+ #include <QtWidgets/QApplication>
+ #include <QtGui/QClipboard>
++#include <emscripten.h>
+ 
+ #define emit
+ 
+@@ -360,7 +361,10 @@ void GenericObjectInspector::createContextMenu(QPoint pos)
+         menu->addAction(copyLineAction);
+         menu->addAction(copyLineHighlightedAction);
+ 
+-        menu->exec(treeView->mapToGlobal(pos));
++        menu->popup(treeView->mapToGlobal(pos));
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++        while(!triggered) emscripten_sleep(10);      
+         delete menu;
+     }
+ }
+diff --git a/src/qtenv/loginspector.cc b/src/qtenv/loginspector.cc
+index c2ac649401..3b5b056746 100644
+--- a/src/qtenv/loginspector.cc
++++ b/src/qtenv/loginspector.cc
+@@ -41,6 +41,8 @@
+ #include "messageprintertagsdialog.h"
+ #include "textviewerproviders.h"
+ 
++#include <emscripten.h>
++
+ using namespace omnetpp::common;
+ using namespace omnetpp::internal;
+ 
+@@ -390,7 +392,10 @@ void LogInspector::onRightClicked(QPoint globalPos, int lineIndex, int column)
+             groupDigitsAction->setChecked(getQtenv()->opt->messageLogDigitGrouping);
+         }
+ 
+-        menu->exec(globalPos);
++        menu->popup(globalPos);
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++        while(!triggered) emscripten_sleep(10);
+     }
+ }
+ 
 diff --git a/src/qtenv/mainwindow.cc b/src/qtenv/mainwindow.cc
 index de6271f513..7ae9639e7a 100644
 --- a/src/qtenv/mainwindow.cc
@@ -55,6 +159,81 @@ index de6271f513..7ae9639e7a 100644
  }
  
  // runUntil
+diff --git a/src/qtenv/moduleinspector.cc b/src/qtenv/moduleinspector.cc
+index 9142986f27..c59cf54091 100644
+--- a/src/qtenv/moduleinspector.cc
++++ b/src/qtenv/moduleinspector.cc
+@@ -51,6 +51,8 @@
+ #include "layersdialog.h"
+ #include "messageanimator.h"
+ 
++#include <emscripten.h>
++
+ using namespace omnetpp::common;
+ 
+ #define emit
+@@ -727,7 +729,10 @@ void ModuleInspector::createContextMenu(const std::vector<cObject *>& objects, c
+     menu->addAction("Export to PDF...", canvasViewer, SLOT(exportToPdf()));
+     menu->addAction("Print...", canvasViewer, SLOT(print()));
+ 
+-    menu->exec(globalPos);
++    menu->popup(globalPos, nullptr);
++    bool triggered = false;
++    connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++    while(!triggered) emscripten_sleep(10);  
+     delete menu;
+ }
+ 
+diff --git a/src/qtenv/objectlistview.cc b/src/qtenv/objectlistview.cc
+index d7910be74a..22e239fba0 100644
+--- a/src/qtenv/objectlistview.cc
++++ b/src/qtenv/objectlistview.cc
+@@ -25,6 +25,8 @@
+ 
+ #include <QtCore/QDebug>
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ namespace omnetpp {
+@@ -77,7 +79,10 @@ void ObjectListView::contextMenuEvent(QContextMenuEvent *event)
+     QMenu *menu = InspectorUtil::createInspectorContextMenu(object);
+     menu->setDisabled(state);
+ 
+-    menu->exec(event->globalPos());
++    menu->popup(event->globalPos());
++    bool triggered = false;
++    connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++    while(!triggered) emscripten_sleep(10);
+ 
+     delete menu;
+ }
+diff --git a/src/qtenv/objecttreeinspector.cc b/src/qtenv/objecttreeinspector.cc
+index aa8cbd0f2b..8fcb9bb71c 100644
+--- a/src/qtenv/objecttreeinspector.cc
++++ b/src/qtenv/objecttreeinspector.cc
+@@ -30,6 +30,8 @@
+ 
+ #include <QtCore/QDebug>
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ namespace omnetpp {
+@@ -134,7 +136,10 @@ void ObjectTreeInspector::createContextMenu(QPoint pos)
+             objects.push_back(objToInspect);
+ 
+         QMenu *menu = InspectorUtil::createInspectorContextMenu(objects, this);
+-        menu->exec(mapToGlobal(pos));
++        menu->popup(mapToGlobal(pos));
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++        while(!triggered) emscripten_sleep(10);        
+         delete menu;
+     }
+ }
 diff --git a/src/qtenv/qtenv.cc b/src/qtenv/qtenv.cc
 index 90d2574038..435f16bef3 100644
 --- a/src/qtenv/qtenv.cc
@@ -116,6 +295,41 @@ index 90d2574038..435f16bef3 100644
          }
          catch (std::exception& e) {
              // if nonexistent config was given as argument or the run filter couldn't be applied, etc...
+diff --git a/src/qtenv/timelineinspector.cc b/src/qtenv/timelineinspector.cc
+index ad550043b2..04ce5e60fc 100644
+--- a/src/qtenv/timelineinspector.cc
++++ b/src/qtenv/timelineinspector.cc
+@@ -22,6 +22,8 @@
+ #include "inspectorfactory.h"
+ #include "qtenv.h"
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ namespace omnetpp {
+@@ -67,13 +69,19 @@ void TimeLineInspector::createContextMenu(QVector<cObject *> objects, QPoint glo
+ {
+     if (objects.size()) {
+         QMenu *menu = InspectorUtil::createInspectorContextMenu(objects, this);
+-        menu->exec(globalPos);
++        menu->popup(globalPos);
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++        while(!triggered) emscripten_sleep(10);            
+         delete menu;
+     }
+     else {
+         QMenu *menu = new QMenu();
+         menu->addAction("Timeline Settings...", this, SLOT(runPreferencesDialog()));
+-        menu->exec(globalPos);
++        menu->popup(globalPos);
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++        while(!triggered) emscripten_sleep(10);    
+         delete menu;
+     }
+ }
 -- 
 2.37.0
 
