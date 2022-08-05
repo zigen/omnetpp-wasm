@@ -22,3 +22,10 @@ $ python -m http.server
 ```
 
 then go to `http://localhost:8000`
+
+## export patch
+```sh
+$ cd omnetpp
+# commit changes
+$ git format-patch -o ../patches 7f833f4..HEAD     
+```
