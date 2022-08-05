@@ -1,3 +1,60 @@
+From c4fbb29323f0166341b912b0f927601527c9a66d Mon Sep 17 00:00:00 2001
+From: zigen <hrlclb@gmail.com>
+Date: Fri, 5 Aug 2022 15:51:11 +0900
+Subject: [PATCH 3/3] stop creating new main loop
+
+because wasm runs in single thread environment
+---
+ src/qtenv/mainwindow.cc | 27 ++++++++++++++-------------
+ src/qtenv/qtenv.cc      | 35 ++++++++++++++++-------------------
+ 2 files changed, 30 insertions(+), 32 deletions(-)
+
+diff --git a/src/qtenv/mainwindow.cc b/src/qtenv/mainwindow.cc
+index de6271f513..7ae9639e7a 100644
+--- a/src/qtenv/mainwindow.cc
++++ b/src/qtenv/mainwindow.cc
+@@ -57,6 +57,8 @@
+ #include "videorecordingdialog.h"
+ #include "qtutil.h"
+ 
++#include <emscripten.h>
++
+ #define emit
+ 
+ using namespace omnetpp::common;
+@@ -556,20 +558,19 @@ void MainWindow::on_actionSetUpConfiguration_triggered()
+ 
+     cConfigurationEx *configEx = getQtenv()->getConfigEx();
+ 
+-    // No filter used for subsequent run selections.
+-    // Note that if invoked this way, we pretty much avoid all possibility of an exception,
+-    // because the run filter is constant, and the config name is the current one, so it must exist.
+-    // This, and the fact that Qtenv::displayException is protected, along with Qt not supporting
+-    // throwing exceptions from slots, justifies the omission of a try-catch block.
+-    // It would only be an ASSERT(false) or something similar anyway.
+-    RunSelectionDialog dialog(configEx, configEx->getActiveConfigName(), "", this);
+-    if (dialog.exec()) {
+-        busy("Setting up new run...");
+-        emit setNewNetwork();
+-        env->newRun(dialog.getConfigName().c_str(), dialog.getRunNumber());
+-        busy();
+-        reflectConfigOnUi();
++    auto *dialog = new RunSelectionDialog(configEx, configEx->getActiveConfigName(), "", this);
++    bool accepted = false;
++    connect(dialog, &RunSelectionDialog::accepted, [&](){ accepted = true; });
++    dialog->open();
++    while(!accepted) {
++        emscripten_sleep(10);
+     }
++    busy("Setting up new run...");
++    emit setNewNetwork();
++    env->newRun(dialog->getConfigName().c_str(), dialog->getRunNumber());
++    busy();
++    // reflectRecordEventlog();
++    return;
+ }
+ 
+ // runUntil
 diff --git a/src/qtenv/qtenv.cc b/src/qtenv/qtenv.cc
 index 90d2574038..435f16bef3 100644
 --- a/src/qtenv/qtenv.cc
@@ -59,3 +116,6 @@ index 90d2574038..435f16bef3 100644
          }
          catch (std::exception& e) {
              // if nonexistent config was given as argument or the run filter couldn't be applied, etc...
+-- 
+2.37.0
+
