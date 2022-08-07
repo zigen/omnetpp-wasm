@@ -1,4 +1,4 @@
-From 749a22ab5c458955cfb1ca0c2c585b31b78f0f47 Mon Sep 17 00:00:00 2001
+From d57b78b427d73de42e4a038f914a40830a29d08a Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:49:25 +0900
 Subject: [PATCH 2/3] disable building executables

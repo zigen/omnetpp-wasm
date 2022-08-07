@@ -1,21 +1,22 @@
-From 25d9f2cc2ef37b75e35db02d63447a37e4e66394 Mon Sep 17 00:00:00 2001
+From 6917bd56828d1da1bc96816329c8d8afd53eac5a Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:51:11 +0900
 Subject: [PATCH 3/3] stop creating new main loop
 
 because wasm runs in single thread environment
+also import WasmPlatform and SVG plugins
 ---
- src/qtenv/canvasinspector.cc         |  8 ++++++-
+ src/qtenv/canvasinspector.cc         |  8 +++++-
  src/qtenv/displayupdatecontroller.cc |  3 +++
  src/qtenv/genericobjectinspector.cc  |  6 ++++-
  src/qtenv/loginspector.cc            |  7 +++++-
- src/qtenv/mainwindow.cc              | 27 ++++++++++-----------
+ src/qtenv/mainwindow.cc              | 27 ++++++++++----------
  src/qtenv/moduleinspector.cc         |  7 +++++-
  src/qtenv/objectlistview.cc          |  7 +++++-
  src/qtenv/objecttreeinspector.cc     |  7 +++++-
- src/qtenv/qtenv.cc                   | 35 +++++++++++++---------------
- src/qtenv/timelineinspector.cc       | 12 ++++++++--
- 10 files changed, 79 insertions(+), 40 deletions(-)
+ src/qtenv/qtenv.cc                   | 37 ++++++++++++++--------------
+ src/qtenv/timelineinspector.cc       | 12 +++++++--
+ 10 files changed, 81 insertions(+), 40 deletions(-)
 
 diff --git a/src/qtenv/canvasinspector.cc b/src/qtenv/canvasinspector.cc
 index 9e225b37a7..4ecf8a886c 100644
@@ -235,10 +236,10 @@ index aa8cbd0f2b..8fcb9bb71c 100644
      }
  }
 diff --git a/src/qtenv/qtenv.cc b/src/qtenv/qtenv.cc
-index 90d2574038..435f16bef3 100644
+index 90d2574038..4cd986482d 100644
 --- a/src/qtenv/qtenv.cc
 +++ b/src/qtenv/qtenv.cc
-@@ -111,6 +111,13 @@ void initFontsResource()
+@@ -111,6 +111,15 @@ void initFontsResource()
      Q_INIT_RESOURCE(fonts);
  }
  
@@ -248,11 +249,13 @@ index 90d2574038..435f16bef3 100644
 +Q_IMPORT_PLUGIN(QGifPlugin)
 +Q_IMPORT_PLUGIN(QICOPlugin)
 +Q_IMPORT_PLUGIN(QJpegPlugin)
++Q_IMPORT_PLUGIN(QSvgPlugin)
++Q_IMPORT_PLUGIN(QSvgIconPlugin)
 +
  namespace omnetpp {
  
  namespace qtenv {
-@@ -844,7 +851,6 @@ void Qtenv::runSimulation(RunMode mode, simtime_t until_time, eventnumber_t unti
+@@ -844,7 +853,6 @@ void Qtenv::runSimulation(RunMode mode, simtime_t until_time, eventnumber_t unti
      doNextEventInStep = getSimulation()->isTrapOnNextEventRequested() || displayUpdateController->rightBeforeEvent();
  
      updateStatusDisplay();
@@ -260,7 +263,7 @@ index 90d2574038..435f16bef3 100644
  
      startClock();
      notifyLifecycleListeners(LF_ON_SIMULATION_RESUME);
-@@ -1708,25 +1714,16 @@ void Qtenv::initialSetUpConfiguration()
+@@ -1708,25 +1716,16 @@ void Qtenv::initialSetUpConfiguration()
      }
      else {
          try {
