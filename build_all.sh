@@ -19,6 +19,14 @@ if [ ! -d ~/qtbase/qtbase ]; then
 	echo "::endgroup::"
 fi
 
+if [ ! -d ~/qtsvg/lib ]; then
+	echo "::group::Building QtSvg"
+	cd ~/qtsvg
+	qmake
+	make -j4
+	echo "::endgroup::"
+fi
+
 if [ ! -d ~/omnetpp/lib/liboppqtenv.a ]; then
 	echo "::group::Building OMNeT"
 	cd ~/
