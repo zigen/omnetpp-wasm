@@ -37,7 +37,7 @@ if [ ! -d ~/omnetpp/lib/liboppqtenv.a ]; then
 	ln -sf /usr/bin/python3 /usr/bin/python 
 	source setenv
 	# make clean -j4
-	emconfigure ./configure || cat ./config.log
+	emconfigure ./configure WITH_OSG=no || cat ./config.log
 	emmake make -j4 common
 	emmake make -j4 layout eventlog 
 	emmake make -j4 scave nedxml sim envir utils 
