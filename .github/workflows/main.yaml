@@ -15,8 +15,8 @@ jobs:
           submodules: true
       - name: Extract submodule hashes
         run: |
-          echo qtbase_hash=`git ls-tree HEAD qtbase | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
-          echo omnetpp_hash=`git ls-tree HEAD omnetpp | tr -s "\t" " " | cut -f 3 -d" "` >> $GITHUB_ENV
+          echo qtbase_hash=$(git ls-tree HEAD qtbase | tr -s "\t" " " | cut -f 3 -d" ") >> $GITHUB_ENV
+          echo omnetpp_hash=$(git ls-tree HEAD omnetpp | tr -s "\t" " " | cut -f 3 -d" ") >> $GITHUB_ENV
       - uses: actions/cache@v2
         with:
           path: |
@@ -41,7 +41,7 @@ jobs:
           docker load --input /tmp/omnetpp-wasm.tar
       - name: Move Cache from image
         run: |
-          docker run -t -v `pwd`:/usr/app ghcr.io/${{ github.repository }}:${{ github.sha }} bash -c "cp -R /root/omnetpp/lib /root/omnetpp/Makefile.inc /usr/app/omnetpp/ && cp -R /root/qtbase/qtbase /usr/app/qtbase/"
+          docker run -t -v $(pwd):/usr/app ghcr.io/${{ github.repository }}:${{ github.sha }} bash -c "cp -R /root/omnetpp/lib /root/omnetpp/Makefile.inc /usr/app/omnetpp/ && cp -R /root/qtbase/qtbase /usr/app/qtbase/"
           ls -la
       - name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -68,9 +68,10 @@ jobs:
           docker load --input /tmp/omnetpp-wasm.tar
       - name: Build Example
         run: |
-          docker run -t -v `pwd`:/usr/app -w /usr/app ghcr.io/${{ github.repository }}:${{ github.sha }} bash build_samples.sh
+          docker run -t -v $(pwd):/usr/app -w /usr/app ghcr.io/${{ github.repository }}:${{ github.sha }} bash build_samples.sh
           ls -la public
       - name: Publish
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: netlify/actions/cli@master
         with:
           args: deploy --dir=public --prod
@@ -79,6 +80,7 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
   push-to-registry:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
     needs: build
     steps:
       - name: Set up Docker Buildx
