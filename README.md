@@ -27,5 +27,5 @@ then go to `http://localhost:8000`
 ```sh
 $ cd omnetpp
 # commit changes
-$ git format-patch -o ../patches 7f833f4..HEAD     
+$ git format-patch -o ../patches 71d8fab..HEAD     
 ```
