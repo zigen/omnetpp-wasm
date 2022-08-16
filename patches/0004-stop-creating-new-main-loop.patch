@@ -1,4 +1,4 @@
-From 035a789db34203a7f791806d416cd0678f40e7c5 Mon Sep 17 00:00:00 2001
+From acda7fe7a2cf62ac3e2eee8180023b9662f5c67b Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:51:11 +0900
 Subject: [PATCH 4/4] stop creating new main loop
@@ -6,17 +6,21 @@ Subject: [PATCH 4/4] stop creating new main loop
 because wasm runs in single thread environment
 also import WasmPlatform and SVG plugins
 ---
- src/qtenv/canvasinspector.cc         |  8 +++++-
- src/qtenv/displayupdatecontroller.cc |  3 +++
- src/qtenv/genericobjectinspector.cc  |  6 ++++-
- src/qtenv/loginspector.cc            |  7 +++++-
- src/qtenv/mainwindow.cc              | 27 ++++++++++----------
- src/qtenv/moduleinspector.cc         |  7 +++++-
- src/qtenv/objectlistview.cc          |  7 +++++-
- src/qtenv/objecttreeinspector.cc     |  7 +++++-
- src/qtenv/qtenv.cc                   | 37 ++++++++++++++--------------
- src/qtenv/timelineinspector.cc       | 12 +++++++--
- 10 files changed, 81 insertions(+), 40 deletions(-)
+ src/qtenv/canvasinspector.cc         |  8 +++-
+ src/qtenv/displayupdatecontroller.cc |  3 ++
+ src/qtenv/fileeditor.cc              | 13 ++++++-
+ src/qtenv/genericobjectinspector.cc  |  6 ++-
+ src/qtenv/histograminspector.cc      |  9 ++++-
+ src/qtenv/inspectorutil.cc           |  9 ++++-
+ src/qtenv/loginspector.cc            | 37 +++++++++++++++++--
+ src/qtenv/mainwindow.cc              | 51 ++++++++++++++++----------
+ src/qtenv/moduleinspector.cc         |  7 +++-
+ src/qtenv/objectlistview.cc          |  7 +++-
+ src/qtenv/objecttreeinspector.cc     |  7 +++-
+ src/qtenv/osg/osgviewer.cc           |  8 +++-
+ src/qtenv/qtenv.cc                   | 55 +++++++++++++++++-----------
+ src/qtenv/timelineinspector.cc       | 12 +++++-
+ 14 files changed, 176 insertions(+), 56 deletions(-)
 
 diff --git a/src/qtenv/canvasinspector.cc b/src/qtenv/canvasinspector.cc
 index 9e225b37a7..4ecf8a886c 100644
@@ -65,6 +69,44 @@ index 754c51319f..c655a08240 100644
  
      lastGuiUpdateAt = now;
      lastFrameAt = now;
+diff --git a/src/qtenv/fileeditor.cc b/src/qtenv/fileeditor.cc
+index 7ebc70e787..d2b7eebd33 100644
+--- a/src/qtenv/fileeditor.cc
++++ b/src/qtenv/fileeditor.cc
+@@ -26,6 +26,7 @@
+ #include "qtenv.h"
+ 
+ #include <QtCore/QDebug>
++#include <emscripten.h>
+ 
+ namespace omnetpp {
+ namespace qtenv {
+@@ -90,7 +91,10 @@ void FileEditor::onCustomContextMenuRequested(const QPoint& pos)
+         contextMenu->addAction("&Select All", ui->plainTextEdit, SLOT(selectAll()))->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_A));
+     }
+ 
+-    contextMenu->exec(mapToGlobal(pos) + ui->plainTextEdit->pos());
++    contextMenu->popup(mapToGlobal(pos) + ui->plainTextEdit->pos());
++    bool triggered = false;
++    connect(contextMenu, &QMenu::triggered, [&](){ triggered = true; });
++    while(!triggered) emscripten_sleep(10);  
+ }
+ 
+ void FileEditor::addToolBar()
+@@ -156,7 +160,12 @@ void FileEditor::find()
+         getQtenv()->getPref("editor-last-text").value<QString>() : ui->plainTextEdit->textCursor().selectedText();
+ 
+     LogFindDialog findDialog(this, lastText, static_cast<TextViewerWidget::FindOptions>(findOptions));
+-    findDialog.exec();
++    bool accepted = false;
++    connect(&findDialog, &LogFindDialog::accepted, [&](){ accepted = true; });
++    findDialog.open();
++    while(!accepted) {
++        emscripten_sleep(10);
++    }
+ 
+     findOptions = findDialog.getOptions();
+     getQtenv()->setPref("editor-case-sensitive", bool(findOptions & TextViewerWidget::FIND_CASE_SENSITIVE));
 diff --git a/src/qtenv/genericobjectinspector.cc b/src/qtenv/genericobjectinspector.cc
 index 68020e1f68..9ee305e78b 100644
 --- a/src/qtenv/genericobjectinspector.cc
@@ -89,8 +131,62 @@ index 68020e1f68..9ee305e78b 100644
          delete menu;
      }
  }
+diff --git a/src/qtenv/histograminspector.cc b/src/qtenv/histograminspector.cc
+index 3225de20b0..30f32ed3f4 100644
+--- a/src/qtenv/histograminspector.cc
++++ b/src/qtenv/histograminspector.cc
+@@ -26,6 +26,8 @@
+ #include "histograminspector.h"
+ #include "histograminspectorconfigdialog.h"
+ 
++#include <emscripten.h>
++
+ static const double X_RANGE = 1;  // use when minX>=maxX
+ static const double Y_RANGE = 1;  // use when minY>=maxY
+ static const QColor BACKGROUND_COLOR("#E2E8FA");
+@@ -303,7 +305,12 @@ void HistogramInspector::onCustomContextMenuRequested(QPoint pos)
+ 
+     // if mouse pos isn't contained by viewport, then context menu will appear in view (10, 10) pos
+     QPoint eventPos = view->viewport()->rect().contains(pos) ? pos : QPoint(10, 10);
+-    menu->exec(view->mapToGlobal(eventPos));
++    bool accepted = false;
++    connect(menu, &QMenu::triggered, [&]() { accepted = true; });
++    menu->popup(view->mapToGlobal(eventPos));
++    while(!accepted) {
++        emscripten_sleep(10);
++    }
+ }
+ 
+ void HistogramInspector::onShowCounts()
+diff --git a/src/qtenv/inspectorutil.cc b/src/qtenv/inspectorutil.cc
+index 61934f0b61..51c0cac358 100644
+--- a/src/qtenv/inspectorutil.cc
++++ b/src/qtenv/inspectorutil.cc
+@@ -31,6 +31,8 @@
+ #include "genericobjectinspector.h"
+ #include "mainwindow.h"
+ 
++#include <emscripten.h>
++
+ namespace omnetpp {
+ using namespace common;
+ namespace qtenv {
+@@ -298,7 +300,12 @@ void InspectorUtil::setClipboard(QString str)
+ void InspectorUtil::preferencesDialog(eTab defaultPage)
+ {
+     PreferencesDialog *prefDialog = new PreferencesDialog(defaultPage, getQtenv()->getMainWindow());
+-    prefDialog->exec();
++    bool accepted = false;
++    GenericObjectTreeModel::connect(prefDialog, &PreferencesDialog::accepted, [&](){ accepted = true; });
++    prefDialog->open();
++    while(!accepted) {
++        emscripten_sleep(10);
++    }
+     delete prefDialog;
+ }
+ 
 diff --git a/src/qtenv/loginspector.cc b/src/qtenv/loginspector.cc
-index c2ac649401..3b5b056746 100644
+index c2ac649401..fa6d9b32a1 100644
 --- a/src/qtenv/loginspector.cc
 +++ b/src/qtenv/loginspector.cc
 @@ -41,6 +41,8 @@
@@ -102,7 +198,58 @@ index c2ac649401..3b5b056746 100644
  using namespace omnetpp::common;
  using namespace omnetpp::internal;
  
-@@ -390,7 +392,10 @@ void LogInspector::onRightClicked(QPoint globalPos, int lineIndex, int column)
+@@ -314,7 +316,15 @@ void LogInspector::refresh()
+ void LogInspector::onFindButton()
+ {
+     auto dialog = new LogFindDialog(this, lastFindText, lastFindOptions);
+-    if (dialog->exec() == QDialog::Accepted) {
++    bool accepted = false;
++    bool rejected = false;
++    connect(dialog, &QDialog::accepted, [&](){ accepted = true; });
++    connect(dialog, &QDialog::rejected, [&](){ rejected = true; });
++    dialog->open();
++    while(!accepted || !rejected) {
++        emscripten_sleep(10);
++    }
++    if (accepted) {
+         lastFindText = dialog->getText();
+         lastFindOptions = dialog->getOptions();
+         if (!lastFindText.isEmpty())
+@@ -327,7 +337,15 @@ void LogInspector::onFilterButton()
+ {
+     if (cModule *module = dynamic_cast<cModule *>(object)) {
+         LogFilterDialog dialog(this, module, excludedModuleIds);
+-        if (dialog.exec() == QDialog::Accepted) {
++        bool accepted = false;
++        bool rejected = false;
++        connect(&dialog, &QDialog::accepted, [&](){ accepted = true; });
++        connect(&dialog, &QDialog::rejected, [&](){ rejected = true; });
++        dialog.open();
++        while(!accepted || !rejected) {
++           emscripten_sleep(10);
++        }
++        if (accepted) {
+             excludedModuleIds = dialog.getExcludedModuleIds();
+             contentProvider->setExcludedModuleIds(excludedModuleIds);
+             saveExcludedModules();
+@@ -338,7 +356,15 @@ void LogInspector::onFilterButton()
+ void LogInspector::onMessagePrinterTagsButton()
+ {
+     MessagePrinterTagsDialog dialog(this, gatherAllMessagePrinterTags(), &messagePrinterOptions);
+-    if (dialog.exec() == QDialog::Accepted) {
++    bool accepted = false;
++    bool rejected = false;
++    connect(&dialog, &QDialog::accepted, [&](){ accepted = true; });
++    connect(&dialog, &QDialog::rejected, [&](){ rejected = true; });
++    dialog.open();
++    while(!accepted || !rejected) {
++        emscripten_sleep(10);
++    }
++    if (accepted) {
+         messagePrinterOptions.enabledTags = dialog.getEnabledTags();
+         contentProvider->refresh();
+         saveMessagePrinterOptions();
+@@ -390,7 +416,10 @@ void LogInspector::onRightClicked(QPoint globalPos, int lineIndex, int column)
              groupDigitsAction->setChecked(getQtenv()->opt->messageLogDigitGrouping);
          }
  
@@ -115,7 +262,7 @@ index c2ac649401..3b5b056746 100644
  }
  
 diff --git a/src/qtenv/mainwindow.cc b/src/qtenv/mainwindow.cc
-index de6271f513..7ae9639e7a 100644
+index de6271f513..a0b36a5c73 100644
 --- a/src/qtenv/mainwindow.cc
 +++ b/src/qtenv/mainwindow.cc
 @@ -57,6 +57,8 @@
@@ -127,7 +274,33 @@ index de6271f513..7ae9639e7a 100644
  #define emit
  
  using namespace omnetpp::common;
-@@ -556,20 +558,19 @@ void MainWindow::on_actionSetUpConfiguration_triggered()
+@@ -242,8 +244,10 @@ void MainWindow::onSimTimeLabelContextMenuRequested(QPoint pos)
+     action->setCheckable(true);
+     action->setChecked(simTimeUnits);
+ 
+-    menu->exec(simTimeLabel->mapToGlobal(pos));
+-
++    menu->popup(simTimeLabel->mapToGlobal(pos));
++    bool triggered = false;
++    connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++    while(!triggered) emscripten_sleep(10);  
+     delete menu;
+ }
+ 
+@@ -314,8 +318,10 @@ void MainWindow::onEventNumLabelContextMenuRequested(QPoint pos)
+             action->setChecked(true);
+     }
+ 
+-    menu->exec(eventNumLabel->mapToGlobal(pos));
+-
++    menu->popup(eventNumLabel->mapToGlobal(pos));
++    bool triggered = false;
++    connect(menu, &QMenu::triggered, [&](){ triggered = true; });
++    while(!triggered) emscripten_sleep(10);  
+     delete menu;
+ }
+ 
+@@ -556,20 +562,19 @@ void MainWindow::on_actionSetUpConfiguration_triggered()
  
      cConfigurationEx *configEx = getQtenv()->getConfigEx();
  
@@ -160,6 +333,32 @@ index de6271f513..7ae9639e7a 100644
  }
  
  // runUntil
+@@ -1191,7 +1196,10 @@ void MainWindow::on_actionAbout_OMNeT_Qtenv_triggered()
+     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+     connect(buttonBox, SIGNAL(accepted()), about, SLOT(accept()));
+     layout->addWidget(buttonBox);
+-    about->exec();
++    about->open();
++    bool triggered = false;
++    connect(about, &QDialog::accepted, [&](){ triggered = true; });
++    while(!triggered) emscripten_sleep(10);
+ 
+     delete layout;
+     delete frameLayout;
+@@ -1418,7 +1426,12 @@ void MainWindow::on_actionRecordVideo_toggled(bool checked)
+ 
+         VideoRecordingDialog dialog(this, configRun);
+ 
+-        dialog.exec();
++        bool accepted = false;
++        connect(&dialog, &QDialog::accepted, [&]() { accepted = true; });
++        dialog.open();
++        while(!accepted) {
++            emscripten_sleep(10);
++        }
+ 
+         if (dialog.result() == QDialog::Accepted) {
+             setFixedSize(width() / 2 * 2, height() / 2 * 2);
 diff --git a/src/qtenv/moduleinspector.cc b/src/qtenv/moduleinspector.cc
 index 9142986f27..c59cf54091 100644
 --- a/src/qtenv/moduleinspector.cc
@@ -235,8 +434,34 @@ index aa8cbd0f2b..8fcb9bb71c 100644
          delete menu;
      }
  }
+diff --git a/src/qtenv/osg/osgviewer.cc b/src/qtenv/osg/osgviewer.cc
+index 1cfa4bff90..22cd443c84 100644
+--- a/src/qtenv/osg/osgviewer.cc
++++ b/src/qtenv/osg/osgviewer.cc
+@@ -42,6 +42,7 @@
+ #include <osg/Depth>
+ #include <osg/DeleteHandler>
+ #include <osg/Version>
++#include <emscripten.h>
+ 
+ #define emit
+ 
+@@ -851,7 +852,12 @@ void OsgViewer::mouseReleaseEvent(QMouseEvent *event)
+         }
+ 
+         menu->addMenu(createCameraManipulatorMenu());
+-        menu->exec(event->globalPos());
++        bool triggered = false;
++        connect(menu, &QMenu::triggered, [&](){ triggered = true; }); 
++        menu->popup(event->globalPos());
++        while(!triggered) {
++            emscripten_sleep(10);
++        }
+     }
+ }
+ 
 diff --git a/src/qtenv/qtenv.cc b/src/qtenv/qtenv.cc
-index 90d2574038..4cd986482d 100644
+index 90d2574038..06191ea372 100644
 --- a/src/qtenv/qtenv.cc
 +++ b/src/qtenv/qtenv.cc
 @@ -111,6 +111,15 @@ void initFontsResource()
@@ -298,6 +523,38 @@ index 90d2574038..4cd986482d 100644
          }
          catch (std::exception& e) {
              // if nonexistent config was given as argument or the run filter couldn't be applied, etc...
+@@ -1873,7 +1872,12 @@ bool Qtenv::ensureDebugger(cRuntimeError *error)
+     QMessageBox::ButtonRole clickedRole = QMessageBox::AcceptRole;
+ 
+     if (!message.isEmpty()) {
+-        messageBox.exec();
++        bool clicked = false;
++        connect(&messageBox, &QMessageBox::buttonClicked, [&]() { clicked = true; });
++        messageBox.open();
++        while(!clicked) {
++            emscripten_sleep(10);
++        }
+         clickedRole = messageBox.buttonRole(messageBox.clickedButton());
+     }
+ 
+@@ -2468,7 +2472,16 @@ bool Qtenv::inputDialog(const char *title, const char *prompt,
+ 
+     dialog->setLayout(layout);
+ 
+-    if (dialog->exec() == QDialog::Rejected)
++    bool accepted = false;
++    bool rejected = false;
++    connect(dialog, &QDialog::accepted, [&](){ accepted = true; });
++    connect(dialog, &QDialog::rejected, [&](){ rejected = true; });
++    dialog->open();
++    while(!accepted || !rejected) {
++        emscripten_sleep(10);
++     }
++
++    if (rejected)
+         return false;
+ 
+     outResult = edit->text().toStdString();
 diff --git a/src/qtenv/timelineinspector.cc b/src/qtenv/timelineinspector.cc
 index ad550043b2..04ce5e60fc 100644
 --- a/src/qtenv/timelineinspector.cc
