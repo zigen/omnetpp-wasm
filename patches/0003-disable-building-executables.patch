@@ -1,7 +1,7 @@
 From e52beccb2bac8bd8db19e5d16c2e249faa3eb576 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:49:25 +0900
-Subject: [PATCH 3/4] disable building executables
+Subject: [PATCH 3/5] disable building executables
 
 ---
  src/eventlog/Makefile |  2 +-
