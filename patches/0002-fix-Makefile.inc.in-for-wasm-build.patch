@@ -1,4 +1,4 @@
-From f81eae25c0ae24e105dabe56cb8a6e36f9208d17 Mon Sep 17 00:00:00 2001
+From 77def1fccf94685cbc5a30da5602b64dc0f88b31 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:48:22 +0900
 Subject: [PATCH 2/4] fix Makefile.inc.in for wasm build
@@ -9,7 +9,7 @@ link qtsvg, qwasm and all libraries
  1 file changed, 51 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.inc.in b/Makefile.inc.in
-index fe9fcd8210..81d33d838b 100644
+index fe9fcd8210..64dc8ad2c3 100644
 --- a/Makefile.inc.in
 +++ b/Makefile.inc.in
 @@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
@@ -60,7 +60,7 @@ index fe9fcd8210..81d33d838b 100644
 +  CFLAGS_RELEASE+= -O3 -Os
 +  PRELOAD_FILES ?= --preload-file .
 +  CFLAGS+= -s DISABLE_EXCEPTION_CATCHING=0 -s USE_PTHREADS=0
-+  LDFLAGS+= --bind -s ASYNCIFY=1 -s USE_PTHREADS=0 -s PTHREAD_POOL_SIZE=1 -s TOTAL_MEMORY=1GB -s WASM=1 -s FULL_ES2=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=0  -s EXPORTED_RUNTIME_METHODS=["UTF16ToString","stringToUTF16","ccall","cwrap"] $(PRELOAD_FILES) --preload-file /root/omnetpp/images@images --preload-file /root/wasm-qtenvrc@.qtenvrc -s DISABLE_EXCEPTION_CATCHING=0 
++  LDFLAGS+= --bind -s ASYNCIFY=1 -s USE_PTHREADS=0 -s PTHREAD_POOL_SIZE=1 -s TOTAL_MEMORY=1GB -s ALLOW_MEMORY_GROWTH -s MAXIMUM_MEMORY=4GB -s WASM=1 -s FULL_ES2=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=0  -s EXPORTED_RUNTIME_METHODS=["UTF16ToString","stringToUTF16","ccall","cwrap"] $(PRELOAD_FILES) --preload-file /root/omnetpp/images@images --preload-file /root/wasm-qtenvrc@.qtenvrc -s DISABLE_EXCEPTION_CATCHING=0 
 +  ifeq ($(MODE),debug)
 +    LDFLAGS += -O3 -Os  -s ASSERTIONS=2 -s SAFE_HEAP=1 -s EXCEPTION_DEBUG=0
 +    #LDFLAGS += -gsource-map -g3 -O0 --source-map-base http://localhost:8080/ -s ASSERTIONS=2 -s SAFE_HEAP=1 -s EXCEPTION_DEBUG=0
