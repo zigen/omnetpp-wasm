@@ -1,9 +1,14 @@
 <script>
   import FileExplorer from "./FileExplorer/index.svelte";
+  import FileView from "./FileView.svelte";
+  import { opendFiles } from "./opendFiles";
 </script>
 
 <div class="file-explorer panel">
   <FileExplorer />
+  {#each $opendFiles as file, index}
+    <FileView abspath={file.path} {index} />
+  {/each}
 </div>
 
 <style>
