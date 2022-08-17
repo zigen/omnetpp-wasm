@@ -6,6 +6,19 @@ on:
     branches: [ master ]
 
 jobs:
+  client-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - run: npm ci
+        working-directory: opp-wasm-app
+      - run: npm run build 
+        working-directory: opp-wasm-app
   build:
     runs-on: ubuntu-latest
     steps:
