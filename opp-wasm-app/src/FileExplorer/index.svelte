@@ -2,19 +2,33 @@
     import ItemRow from "./ItemRow.svelte";
     import { readDir } from "../utils";
     let currentPath = "/";
-    const pathHistory = [];
-    const handleDirClicked = (dir) => () => {
-        pathHistory.push(currentPath);
-        currentPath = PATH.join(currentPath, dir);
+    let pathHistory = [];
+
+    let directories = readDir(currentPath);
+    $: reload = () => {
+        directories = readDir(currentPath);
     };
-    $: directories = readDir(currentPath);
+    $: setInterval(reload, 1000);
+    $: handleDirClicked = (dir) => () => {
+        console.log(dir, currentPath, pathHistory);
+        pathHistory.push(currentPath);
+        pathHistory = pathHistory;
+        currentPath = PATH.join(currentPath, dir);
+        directories = readDir(currentPath);
+    };
+
     const back = () => {
         if (pathHistory.length === 0) return;
         currentPath = pathHistory.pop();
+        pathHistory = pathHistory;
+        directories = readDir(currentPath);
     };
+
     const parent = () => {
         pathHistory.push(currentPath);
+        pathHistory = pathHistory;
         currentPath = PATH.join(currentPath, "..");
+        directories = readDir(currentPath);
     };
 </script>
 

@@ -2,13 +2,18 @@
   import FileExplorer from "./FileExplorer/index.svelte";
   import FileView from "./FileView.svelte";
   import { opendFiles } from "./opendFiles";
+  let isOpen = false;
+  const toggle = () => (isOpen = !isOpen);
 </script>
 
-<div class="file-explorer panel">
-  <FileExplorer />
-  {#each $opendFiles as file, index}
-    <FileView abspath={file.path} {index} />
-  {/each}
+<div class="file-explorer panel" class:open={isOpen}>
+  <button on:click={toggle}>{isOpen ? "close" : "open"}</button>
+  {#if isOpen}
+    <FileExplorer />
+    {#each $opendFiles as file, index}
+      <FileView abspath={file.path} {index} />
+    {/each}
+  {/if}
 </div>
 
 <style>

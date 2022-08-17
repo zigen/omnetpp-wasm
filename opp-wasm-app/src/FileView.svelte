@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { readTextFile } from "./utils";
+    import { readTextFile, createObjectURL } from "./utils";
     import { opendFiles } from "./opendFiles";
     export let abspath;
     export let index;
@@ -11,11 +11,7 @@
     };
 
     onMount(() => {
-        const fileContent = FS.readFile(abspath, { encoding: "utf8" });
-        const mimeType = "application/text";
-        downloadButton.href = URL.createObjectURL(
-            new Blob([fileContent], { type: mimeType })
-        );
+        downloadButton.href = createObjectURL(abspath);
         downloadButton.setAttribute("download", PATH.basename(abspath));
     });
 </script>
