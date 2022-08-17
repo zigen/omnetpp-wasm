@@ -1,7 +1,7 @@
 From 77def1fccf94685cbc5a30da5602b64dc0f88b31 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:48:22 +0900
-Subject: [PATCH 2/5] fix Makefile.inc.in for wasm build
+Subject: [PATCH 2/6] fix Makefile.inc.in for wasm build
 
 link qtsvg, qwasm and all libraries
 ---
