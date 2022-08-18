@@ -48,7 +48,7 @@ WORKDIR /root
 COPY --from=cmd-builder /root/omnetpp/bin/* /usr/local/bin/
 COPY --from=cmd-builder /root/omnetpp/lib/* /usr/lib/
 COPY --from=cmd-builder /root/omnetpp/images/* /root/omnetpp/images/
-COPY --from=client-builder /root/dist /root/omnettp/dist
+COPY --from=client-builder /root/dist /root/omnetpp/dist
 RUN ls -la /root/omnetpp/dist
 
 RUN apt update && apt install bison flex vim file pkg-config libtool -y && pip3 install toml
