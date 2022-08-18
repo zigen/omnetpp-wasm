@@ -1,0 +1,115 @@
+From 4573ee307ab154fa3a5c186ed10d452651d4d6fc Mon Sep 17 00:00:00 2001
+From: zigen <hrlclb@gmail.com>
+Date: Thu, 18 Aug 2022 10:33:31 +0900
+Subject: [PATCH 7/7] disable debug on wasm
+
+---
+ src/qtenv/mainwindow.cc |  2 --
+ src/qtenv/mainwindow.ui | 38 --------------------------------------
+ 2 files changed, 40 deletions(-)
+
+diff --git a/src/qtenv/mainwindow.cc b/src/qtenv/mainwindow.cc
+index 0139ced1de..88d758eabb 100644
+--- a/src/qtenv/mainwindow.cc
++++ b/src/qtenv/mainwindow.cc
+@@ -155,7 +155,6 @@ MainWindow::MainWindow(Qtenv *env, QWidget *parent) :
+ 
+     adjustSize();
+ 
+-    ui->actionDebugOnErrors->setChecked(getQtenv()->debugOnErrors);
+ }
+ 
+ MainWindow::~MainWindow()
+@@ -1063,7 +1062,6 @@ void MainWindow::on_actionEventlogRecording_triggered()
+ void MainWindow::reflectConfigOnUi()
+ {
+     ui->actionEventlogRecording->setChecked(getQtenv()->getEventlogRecording());
+-    ui->actionDebugOnErrors->setChecked(getQtenv()->debugOnErrors);
+ }
+ 
+ // XXX why is this in MainWindow, and not in Qtenv?
+diff --git a/src/qtenv/mainwindow.ui b/src/qtenv/mainwindow.ui
+index 3050a34d8c..15b3bc5cc0 100644
+--- a/src/qtenv/mainwindow.ui
++++ b/src/qtenv/mainwindow.ui
+@@ -311,10 +311,6 @@ Total number of messages created since start of the simulation</string>
+     <addaction name="actionRun"/>
+     <addaction name="actionFastRun"/>
+     <addaction name="separator"/>
+-    <addaction name="actionDebugNow"/>
+-    <addaction name="actionDebugNextEvent"/>
+-    <addaction name="actionDebugOnErrors"/>
+-    <addaction name="separator"/>
+     <addaction name="actionStop"/>
+     <addaction name="separator"/>
+     <addaction name="actionEventlogRecording"/>
+@@ -404,13 +400,11 @@ Total number of messages created since start of the simulation</string>
+    <addaction name="actionRun"/>
+    <addaction name="actionFastRun"/>
+    <addaction name="actionStop"/>
+-   <addaction name="actionDebugNextEvent"/>
+    <addaction name="separator"/>
+    <addaction name="actionConcludeSimulation"/>
+    <addaction name="actionRebuildNetwork"/>
+    <addaction name="separator"/>
+    <addaction name="actionEventlogRecording"/>
+-   <addaction name="actionDebugOnErrors"/>
+    <addaction name="separator"/>
+    <addaction name="actionFindInspectObjects"/>
+    <addaction name="separator"/>
+@@ -659,18 +653,6 @@ Total number of messages created since start of the simulation</string>
+     <string>&amp;Create Snapshot...</string>
+    </property>
+   </action>
+-  <action name="actionDebugNextEvent">
+-   <property name="icon">
+-    <iconset resource="icons.qrc">
+-     <normaloff>:/tools/debugnextevent</normaloff>:/tools/debugnextevent</iconset>
+-   </property>
+-   <property name="text">
+-    <string>&amp;Debug Next Event</string>
+-   </property>
+-   <property name="shortcut">
+-    <string>Ctrl+F9</string>
+-   </property>
+-  </action>
+   <action name="actionRebuildNetwork">
+    <property name="icon">
+     <iconset resource="icons.qrc">
+@@ -788,21 +770,6 @@ Total number of messages created since start of the simulation</string>
+     <string>Ctrl+N</string>
+    </property>
+   </action>
+-  <action name="actionDebugOnErrors">
+-   <property name="checkable">
+-    <bool>true</bool>
+-   </property>
+-   <property name="icon">
+-    <iconset resource="icons.qrc">
+-     <normaloff>:/tools/debugger</normaloff>:/tools/debugger</iconset>
+-   </property>
+-   <property name="text">
+-    <string>Debug On Errors</string>
+-   </property>
+-   <property name="toolTip">
+-    <string>Break into the debugger upon runtime errors</string>
+-   </property>
+-  </action>
+   <action name="actionClassDescriptors">
+    <property name="text">
+     <string>Class &amp;Descriptors</string>
+@@ -835,11 +802,6 @@ Total number of messages created since start of the simulation</string>
+     <string>Message Printers</string>
+    </property>
+   </action>
+-  <action name="actionDebugNow">
+-   <property name="text">
+-    <string>Debug Now</string>
+-   </property>
+-  </action>
+  </widget>
+  <layoutdefault spacing="6" margin="11"/>
+  <resources>
+-- 
+2.37.2
+

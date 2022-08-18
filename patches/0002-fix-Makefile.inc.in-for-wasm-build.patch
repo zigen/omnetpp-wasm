@@ -1,15 +1,15 @@
-From 77def1fccf94685cbc5a30da5602b64dc0f88b31 Mon Sep 17 00:00:00 2001
+From c9d02f3479c92abb16f3f3e516180f568e573622 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:48:22 +0900
-Subject: [PATCH 2/6] fix Makefile.inc.in for wasm build
+Subject: [PATCH 2/7] fix Makefile.inc.in for wasm build
 
 link qtsvg, qwasm and all libraries
 ---
- Makefile.inc.in | 70 +++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 51 insertions(+), 19 deletions(-)
+ Makefile.inc.in | 74 ++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 55 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.inc.in b/Makefile.inc.in
-index fe9fcd8210..64dc8ad2c3 100644
+index fe9fcd8210..e2033e25a3 100644
 --- a/Makefile.inc.in
 +++ b/Makefile.inc.in
 @@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
@@ -21,7 +21,7 @@ index fe9fcd8210..64dc8ad2c3 100644
  LIB_PREFIX = @LIB_PREFIX@
  
  #
-@@ -200,26 +200,58 @@ KERNEL_LIBS = -loppsim$D
+@@ -200,26 +200,62 @@ KERNEL_LIBS = -loppsim$D
  OPPMAIN_LIB = $(LDFLAG_LIB)oppmain$D
  
  #
@@ -80,9 +80,13 @@ index fe9fcd8210..64dc8ad2c3 100644
 +	cp /root/qtbase/qtbase/plugins/platforms/qtloader.js $O/qtloader.js
 +	cp /root/qtbase/qtbase/plugins/platforms/qtlogo.svg $O/qtlogo.svg
 +	cp /root/node_exec_template.js $O/$(TARGET:.js=)
++	cp /root/omnetpp/dist/main.js $O/main.js
++	cp /root/omnetpp/dist/style.css $O/style.css
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/index.html
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/qtloader.js
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/$(TARGET:.js=)
++	echo '<script type="module" src="./main.js"></script>' >> $O/index.html
++	echo '<link href="./style.css" rel="stylesheet">' >> $O/index.html
 +
 +%.js: index.html
 +
@@ -99,5 +103,5 @@ index fe9fcd8210..64dc8ad2c3 100644
  
  #
 -- 
-2.37.0
+2.37.2
 
