@@ -31,7 +31,9 @@ RUN bash -c "source setenv && ./configure WITH_OSG=no && \
     rm -r doc out test samples config.log config.status"
 
 FROM node:16-bullseye
-ADD opp-wasm-app /root/
+ADD ./opp-wasm-app /root/client
+WORKDIR /root/client
+RUN ls -la
 RUN npm ci 
 RUN npm run build --mode=production
 
