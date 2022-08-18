@@ -1,4 +1,4 @@
-From c9d02f3479c92abb16f3f3e516180f568e573622 Mon Sep 17 00:00:00 2001
+From 8925d3940cb391aa2e5cbd2fa1f12266622cebca Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:48:22 +0900
 Subject: [PATCH 2/7] fix Makefile.inc.in for wasm build
@@ -9,7 +9,7 @@ link qtsvg, qwasm and all libraries
  1 file changed, 55 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.inc.in b/Makefile.inc.in
-index fe9fcd8210..e2033e25a3 100644
+index fe9fcd8210..8e74b96106 100644
 --- a/Makefile.inc.in
 +++ b/Makefile.inc.in
 @@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
@@ -80,13 +80,13 @@ index fe9fcd8210..e2033e25a3 100644
 +	cp /root/qtbase/qtbase/plugins/platforms/qtloader.js $O/qtloader.js
 +	cp /root/qtbase/qtbase/plugins/platforms/qtlogo.svg $O/qtlogo.svg
 +	cp /root/node_exec_template.js $O/$(TARGET:.js=)
-+	cp /root/omnetpp/dist/main.js $O/main.js
-+	cp /root/omnetpp/dist/style.css $O/style.css
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/index.html
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/qtloader.js
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/$(TARGET:.js=)
 +	echo '<script type="module" src="./main.js"></script>' >> $O/index.html
 +	echo '<link href="./style.css" rel="stylesheet">' >> $O/index.html
++	cp /root/omnetpp/dist/main.js $O/main.js
++	cp /root/omnetpp/dist/style.css $O/style.css
 +
 +%.js: index.html
 +
