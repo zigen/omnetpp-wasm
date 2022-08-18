@@ -17,3 +17,12 @@ export const createObjectURL = (absPath) => {
     new Blob([fileContent], { type: mimeType })
   );
 }
+
+export const getFileMimeType = (absPath) => {
+  if (absPath.endsWith(".png")  ) return "image/png";
+  if (absPath.endsWith(".gif")  ) return "image/gif";
+  if (absPath.endsWith(".svg")  ) return "image/svg+xml";
+  if (absPath.endsWith(".jpg") || absPath.endsWith(".jpeg")  ) return "image/jpeg";
+  if (absPath.endsWith(".jsonl")) return "application/x-ndjson";
+  return "text/plain";
+}

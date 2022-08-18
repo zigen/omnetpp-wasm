@@ -1,6 +1,6 @@
 <script>
   import FileExplorer from "./FileExplorer/index.svelte";
-  import FileView from "./FileView.svelte";
+  import FileView from "./FileView/Index.svelte";
   import { opendFiles } from "./opendFiles";
   let isOpen = false;
   const toggle = () => (isOpen = !isOpen);

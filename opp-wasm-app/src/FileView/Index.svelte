@@ -1,14 +1,20 @@
 <script>
     import { onMount } from "svelte";
-    import { readTextFile, createObjectURL } from "./utils";
-    import { opendFiles } from "./opendFiles";
+    import { readTextFile, createObjectURL, getFileMimeType } from "../utils";
+    import { opendFiles } from "../opendFiles";
+    import JsonLineContent from "./JsonLineContent.svelte";
+    import TextContent from "./TextContent.svelte";
+    import ImageContent from "./ImageContent.svelte";
+
     export let abspath;
     export let index;
-    let textContent = readTextFile(abspath);
+
     let downloadButton;
+
     const close = () => {
         opendFiles.update((files) => files.filter((f) => f.path !== abspath));
     };
+    const mimeType = getFileMimeType(abspath);
 
     onMount(() => {
         downloadButton.href = createObjectURL(abspath);
@@ -23,7 +29,14 @@
         <a class="download-link" bind:this={downloadButton}>download</a>
     </div>
     <div class="content">
-        {textContent}
+        {mimeType}
+        {#if mimeType.startsWith("image/")}
+            <ImageContent {abspath} {mimeType} />
+        {:else if mimeType == "application/x-ndjson"}
+            <JsonLineContent {abspath} />
+        {:else}
+            <TextContent {abspath} />
+        {/if}
     </div>
 </div>
 

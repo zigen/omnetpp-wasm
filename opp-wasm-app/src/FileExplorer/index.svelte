@@ -10,7 +10,6 @@
     };
     $: setInterval(reload, 1000);
     $: handleDirClicked = (dir) => () => {
-        console.log(dir, currentPath, pathHistory);
         pathHistory.push(currentPath);
         pathHistory = pathHistory;
         currentPath = PATH.join(currentPath, dir);

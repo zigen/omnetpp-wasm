@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { isDir } from "../utils";
+    import { isDir, getFileMimeType } from "../utils";
     import { opendFiles } from "../opendFiles";
     export let pathname;
     export let abspath;
