@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as cmd-builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG VERSION=6.0
@@ -30,7 +30,7 @@ RUN bash -c "source setenv && ./configure WITH_OSG=no && \
     make -j $(nproc) MODE=release base && \
     rm -r doc out test samples config.log config.status"
 
-FROM node:16-bullseye
+FROM node:16-bullseye as client-builder
 ADD ./opp-wasm-app /root/client
 WORKDIR /root/client
 RUN ls -la
@@ -45,10 +45,10 @@ ENV OMNETPP_RELEASE=omnetpp-$VERSION
 ENV QT_SELECT=5
 
 WORKDIR /root
-COPY --from=0 /root/omnetpp/bin/* /usr/local/bin/
-COPY --from=0 /root/omnetpp/lib/* /usr/lib/
-COPY --from=0 /root/omnetpp/images/* /root/omnetpp/images/
-COPY --from=1 /root/dist /root/omnettp/dist
+COPY --from=cmd-builder /root/omnetpp/bin/* /usr/local/bin/
+COPY --from=cmd-builder /root/omnetpp/lib/* /usr/lib/
+COPY --from=cmd-builder /root/omnetpp/images/* /root/omnetpp/images/
+COPY --from=client-builder /root/client/dist /root/omnettp/dist
 RUN apt update && apt install bison flex vim file pkg-config libtool -y && pip3 install toml
 ADD . /root/
 RUN export PATH=$PATH:$HOME/qtbase/qtbase/bin && \
