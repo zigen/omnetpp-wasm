@@ -29,6 +29,12 @@ ENV OMNETPP_RELEASE=omnetpp-$VERSION
 RUN bash -c "source setenv && ./configure WITH_OSG=no && \
     make -j $(nproc) MODE=release base && \
     rm -r doc out test samples config.log config.status"
+
+FROM node:16-bullseye
+ADD opp-wasm-app /root/
+RUN npm ci 
+RUN npm run build --mode=production
+
 FROM emscripten/emsdk:2.0.25
 ARG VERSION=6.0
 ENV PATH /root/omnetpp/bin:$PATH
@@ -40,6 +46,7 @@ WORKDIR /root
 COPY --from=0 /root/omnetpp/bin/* /usr/local/bin/
 COPY --from=0 /root/omnetpp/lib/* /usr/lib/
 COPY --from=0 /root/omnetpp/images/* /root/omnetpp/images/
+COPY --from=1 /root/dist /root/omnettp/dist
 RUN apt update && apt install bison flex vim file pkg-config libtool -y && pip3 install toml
 ADD . /root/
 RUN export PATH=$PATH:$HOME/qtbase/qtbase/bin && \
