@@ -54,8 +54,6 @@ def gen_post_js(config):
     ini_file = ["-f", config["ini-file"]]
     exec_args = config["exec-args"] if "exec-args" in config else [] 
     code = f"""arguments_ = [{wrap_with_double_quote(["-m", "-u", opp_env] + config_args + ned_folders + ini_file + exec_args)}];"""
-    with open("/root/FileExplorer.js", "r") as f:
-        code += f.read()
     print(code)
     with open("post.js", "w") as f:
         f.write(code)
