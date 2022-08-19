@@ -1,13 +1,13 @@
 
 const styles = [];
 const main = () => {
-	const panel = createFileExplorerPanel();
-	const fileList = createFileExplorer();
-	panel.content.appendChild(fileList);
-	const viewer = createFileViewerPanel();
-	document.body.appendChild(viewer);
-	fileList.onSelect = viewer.open;
-	applyCSS();
+  const panel = createFileExplorerPanel();
+  const fileList = createFileExplorer();
+  panel.content.appendChild(fileList);
+  const viewer = createFileViewerPanel();
+  document.body.appendChild(viewer);
+  fileList.onSelect = viewer.open;
+  applyCSS();
 };
 
 styles.push(`
@@ -18,7 +18,7 @@ styles.push(`
 	padding: 0.2rem 0.5rem;
 	border: 1px solid black;
 	max-height: 80vh;
-	max-width: 60vw;
+	max-width: 60v;
 }
 .panel-header {
 	display: flex;
@@ -46,104 +46,104 @@ styles.push(`
 `);
 
 const createElement = (tagName, className, textContent) => {
-	const e = document.createElement(tagName);
-	if (className) e.className = className;
-	if (textContent) e.textContent = textContent;
-	return e;
+  const e = document.createElement(tagName);
+  if (className) e.className = className;
+  if (textContent) e.textContent = textContent;
+  return e;
 }
 const createFileViewerPanel = () => {
-	let isOpen = false;
-	let currentFilePath = null;
-	const panel = createElement("DIV", "panel file-viewer");
+  let isOpen = false;
+  let currentFilePath = null;
+  const panel = createElement("DIV", "panel file-viewer");
 
-	const panelHeader = createElement("DIV", "panel-header");
-	const closeButton = createElement("BUTTON", "close-button","x");
-	const panelTitle = createElement("DIV");
-	const actions = createElement("DIV", "actions-container");
-	const actionButton = createElement("BUTTON", "action-button");
-	const downloadLink = createElement("A", "download-link", "download");
-	downloadLink.onmouseenter = () => {
-		console.log("hover",currentFilePath );
-		downloadLink.href = URL.createObjectURL(new Blob([FS.readFile(currentFilePath,{encoding: "utf8"})], {type: "application/text"}));
-		downloadLink.setAttribute("download", PATH.basename(currentFilePath));
-	}
-	actions.appendChild(actionButton);
-	actions.appendChild(downloadLink);
-	const content = createElement("DIV", "content");
-	panel.content = content;
+  const panelHeader = createElement("DIV", "panel-header");
+  const closeButton = createElement("BUTTON", "close-button", "x");
+  const panelTitle = createElement("DIV");
+  const actions = createElement("DIV", "actions-container");
+  const actionButton = createElement("BUTTON", "action-button");
+  const downloadLink = createElement("A", "download-link", "download");
+  downloadLink.onmouseenter = () => {
+    console.log("hover", currentFilePath);
+    downloadLink.href = URL.createObjectURL(new Blob([FS.readFile(currentFilePath, { encoding: "utf8" })], { type: "application/text" }));
+    downloadLink.setAttribute("download", PATH.basename(currentFilePath));
+  }
+  actions.appendChild(actionButton);
+  actions.appendChild(downloadLink);
+  const content = createElement("DIV", "content");
+  panel.content = content;
 
-	const updatePanel = () => {
-		panel.style.display = isOpen ? "block" : "none";
-	}
-	closeButton.onclick = () => {
-		isOpen = !isOpen;
-		updatePanel();
-	}
-	panelHeader.appendChild(closeButton);
-	panelHeader.appendChild(panelTitle);
-	panelHeader.appendChild(actions);
+  const updatePanel = () => {
+    panel.style.display = isOpen ? "block" : "none";
+  }
+  closeButton.onclick = () => {
+    isOpen = !isOpen;
+    updatePanel();
+  }
+  panelHeader.appendChild(closeButton);
+  panelHeader.appendChild(panelTitle);
+  panelHeader.appendChild(actions);
 
-	panel.appendChild(panelHeader);
-	panel.appendChild(content);
-	document.body.appendChild(panel);
-	updatePanel();
-	panel.open = (path) => {
-		isOpen = true;
-		const contentStr = FS.readFile(path, {encoding: "utf8"});
-		panelTitle.textContent = path;
-		currentFilePath = path;
+  panel.appendChild(panelHeader);
+  panel.appendChild(content);
+  document.body.appendChild(panel);
+  updatePanel();
+  panel.open = (path) => {
+    isOpen = true;
+    const contentStr = FS.readFile(path, { encoding: "utf8" });
+    panelTitle.textContent = path;
+    currentFilePath = path;
 
-		content.textContent = contentStr;
-		updatePanel();
-	}
-	return panel;
+    content.textContent = contentStr;
+    updatePanel();
+  }
+  return panel;
 }
 
 const createFileExplorer = () => {
-	let currentPath = "/"
-	let dirs = [];
-	const listElem = document.createElement("UL");
-	const twodot = createElement("LI", "", "..");
-	twodot.onclick = () => updateCurrentPath(PATH.join(currentPath, ".."));
+  let currentPath = "/"
+  let dirs = [];
+  const listElem = document.createElement("UL");
+  const twodot = createElement("LI", "", "..");
+  twodot.onclick = () => updateCurrentPath(PATH.join(currentPath, ".."));
 
-	const updateCurrentPath = (newPath) => {
-			twodot.style.display = newPath === "/" ? "none" : "list-item";
+  const updateCurrentPath = (newPath) => {
+    twodot.style.display = newPath === "/" ? "none" : "list-item";
 
-		const newDirs = readDir(newPath);
-		const elemsToBeRemoved = dirs.filter(e => !newDirs.includes(e));
-		elemsToBeRemoved.forEach((name) => {
-			const elem  = listElem.querySelector("#" + createId(currentPath ,name));
-			listElem.removeChild(elem);
-		});
-		currentPath = newPath;
-		newDirs.forEach((name) => {
-			const absPath = PATH.join(currentPath,name);
-			const id = createId( currentPath ,name);
-			const isDir = FS.isDir(FS.lstat(absPath).mode);
-			let item = listElem.querySelector("#" + id);
-			if (!item) {
-				item = document.createElement("LI");
-				item.onclick = () => {
-					if (isDir) {
-						console.log(currentPath + name);
-						updateCurrentPath(absPath);
-						return;
-					}
-					if (typeof listElem.onSelect === "function") {
-						listElem.onSelect(absPath);
-					}
-				};
-				item.textContent =　(isDir ? "📁" : "") + absPath;
-				item.id = id;
-				listElem.append(item);
-			}
-		});
-		dirs = newDirs;
-	}
-	listElem.appendChild(twodot);
-	updateCurrentPath("/");
-	setInterval(() => updateCurrentPath(currentPath), 200);
-	return listElem;
+    const newDirs = readDir(newPath);
+    const elemsToBeRemoved = dirs.filter(e => !newDirs.includes(e));
+    elemsToBeRemoved.forEach((name) => {
+      const elem = listElem.querySelector("#" + createId(currentPath, name));
+      listElem.removeChild(elem);
+    });
+    currentPath = newPath;
+    newDirs.forEach((name) => {
+      const absPath = PATH.join(currentPath, name);
+      const id = createId(currentPath, name);
+      const isDir = FS.isDir(FS.lstat(absPath).mode);
+      let item = listElem.querySelector("#" + id);
+      if (!item) {
+        item = document.createElement("LI");
+        item.onclick = () => {
+          if (isDir) {
+            console.log(currentPath + name);
+            updateCurrentPath(absPath);
+            return;
+          }
+          if (typeof listElem.onSelect === "function") {
+            listElem.onSelect(absPath);
+          }
+        };
+        item.textContent = (isDir ? "📁" : "") + absPath;
+        item.id = id;
+        listElem.append(item);
+      }
+    });
+    dirs = newDirs;
+  }
+  listElem.appendChild(twodot);
+  updateCurrentPath("/");
+  setInterval(() => updateCurrentPath(currentPath), 200);
+  return listElem;
 }
 
 styles.push(`
@@ -153,40 +153,34 @@ styles.push(`
 }
 `);
 const createFileExplorerPanel = () => {
-	let isOpen = false;
-	const panel = createElement("DIV", "panel file-explorer");
-	const panelTitle = document.createElement("DIV");
-	panelTitle.style.cursor = "pointer";
-	const content = createElement("DIV", "content");
-	panel.content = content;
+  let isOpen = false;
+  const panel = createElement("DIV", "panel file-explorer");
+  const panelTitle = document.createElement("DIV");
+  panelTitle.style.cursor = "pointer";
+  const content = createElement("DIV", "content");
+  panel.content = content;
 
-	const updatePanel = () => {
-		panel.style.height = isOpen ? "auto" : "1.5rem";
-		panel.style.overflow = isOpen ? "scroll" : "auto";
-		panelTitle.textContent = isOpen ? "x" : "File Explorer";
-		content.style.display = isOpen ? "block" : "none";
-	}
-	panelTitle.onclick = () => {
-		isOpen = !isOpen;
-		updatePanel();
-	}
+  const updatePanel = () => {
+    panel.style.height = isOpen ? "auto" : "1.5rem";
+    panel.style.overflow = isOpen ? "scroll" : "auto";
+    panelTitle.textContent = isOpen ? "x" : "File Explorer";
+    content.style.display = isOpen ? "block" : "none";
+  }
+  panelTitle.onclick = () => {
+    isOpen = !isOpen;
+    updatePanel();
+  }
 
-	panel.appendChild(panelTitle);
-	panel.appendChild(content);
-	document.body.appendChild(panel);
-	updatePanel();
-	return panel;
+  panel.appendChild(panelTitle);
+  panel.appendChild(content);
+  document.body.appendChild(panel);
+  updatePanel();
+  return panel;
 }
-const createId = (workingDir, name) =>  (workingDir + "-" +  name)
-	.replaceAll("\/", "-")
-	.replaceAll("\"", "_")
-	.replaceAll("\.", "dot")
-	.replaceAll("#", "sharp");
-EXCLEDED_DIR =  [".", "..", "home", "tmp", "dev", "proc", "images"];
-const readDir = (path) => FS.readdir(path).filter(e => !EXCLEDED_DIR.includes(e));
+
 const applyCSS = () => {
-	const elem = document.createElement("STYLE");
-	elem.textContent = styles.join("\n");
-	document.body.appendChild(elem);
+  const elem = document.createElement("STYLE");
+  elem.textContent = styles.join("\n");
+  document.body.appendChild(elem);
 };
 main();
