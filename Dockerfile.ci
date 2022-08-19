@@ -49,7 +49,7 @@ COPY --from=cmd-builder /root/omnetpp/bin/* /usr/local/bin/
 COPY --from=cmd-builder /root/omnetpp/lib/* /usr/lib/
 COPY --from=cmd-builder /root/omnetpp/images/* /root/omnetpp/images/
 COPY --from=client-builder /root/js-build/* /root/js-build/
-RUN ls -la /root/omnetpp/dist
+RUN ls -la /root/js-build
 
 RUN apt update && apt install bison flex vim file pkg-config libtool -y && pip3 install toml
 ADD . /root/
