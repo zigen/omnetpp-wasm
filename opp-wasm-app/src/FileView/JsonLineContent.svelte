@@ -14,25 +14,48 @@
     };
     $: if (jsonViewer != null && panelContentJson != null) {
         const formattter = new JSONFormatter(JSON.parse(panelContentJson));
-        while (jsonViewer.firstChild ) {
+        while (jsonViewer.firstChild) {
             jsonViewer.removeChild(jsonViewer.firstChild);
-
-        } 
+        }
         jsonViewer.appendChild(formattter.render());
     }
+    const close = () => {
+        panelContentJson = null;
+        selectedLine = -1;
+    };
 </script>
 
 {#each jsonList as json, index}
-    <div on:click={openJsonPanel(index)} class:selected={index == selectedLine}>{json}</div>
+    <div on:click={openJsonPanel(index)} class:selected={index == selectedLine}>
+        {json}
+    </div>
 {/each}
 
 {#if panelContentJson}
-    <div class="json-view" bind:this={jsonViewer}>
-        {panelContentJson}
+    <div class="json-view panel">
+        <div class="panel-header">
+            <button on:click={close}>x</button>
+        </div>
+        <div bind:this={jsonViewer} class="json-viewer-wrapper" />
     </div>
 {/if}
 
 <style>
+    .panel {
+        position: fixed;
+        background-color: white;
+        overflow: scroll;
+        padding: 0.2rem 0.5rem;
+        border: 1px solid black;
+        max-height: 80vh;
+        max-width: 60v;
+    }
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        position: fixed;
+        padding-bottom: 0.75rem;
+    }
     .json-view {
         top: 14vh;
         left: 30vw;
@@ -46,8 +69,7 @@
         color: white;
         background-color: black;
     }
-    .file-viewer .close-button {
-        content: "x";
-        cursor: pointer;
+    .json-viewer-wrapper {
+        padding-top: 1rem;
     }
 </style>
