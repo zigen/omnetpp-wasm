@@ -29,7 +29,6 @@
         <a class="download-link" bind:this={downloadButton}>download</a>
     </div>
     <div class="content">
-        {mimeType}
         {#if mimeType.startsWith("image/")}
             <ImageContent {abspath} {mimeType} />
         {:else if mimeType == "application/x-ndjson"}
