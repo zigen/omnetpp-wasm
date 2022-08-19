@@ -40,6 +40,15 @@
 </div>
 
 <style>
+    .panel {
+        position: fixed;
+        background-color: white;
+        overflow: scroll;
+        padding: 0.2rem 0.5rem;
+        border: 1px solid black;
+        max-height: 80vh;
+        max-width: 60v;
+    }
     .panel-header {
         display: flex;
         justify-content: space-between;
@@ -53,10 +62,6 @@
         left: 20vw;
         width: 60vw;
         overflow: scroll;
-    }
-    .file-viewer .close-button {
-        content: "x";
-        cursor: pointer;
     }
     .file-viewer .content {
         white-space: pre;
