@@ -15,7 +15,9 @@ export default defineConfig(({ command, mode }) => {
         format: "esm",
       },
       emptyOutDir: false,
-      outDir: "../dist",
+      //outDir: "../omnetpp/samples/tictoc/out/emcc-release",
+      // outDir: "../../quisp/quisp/out/emcc-release",
+      outDir: "../js-build",
       watch: isProduction ? null : {},
       minify: isProduction,
       rollupOptions: {
