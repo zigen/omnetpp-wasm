@@ -13,6 +13,8 @@
     {#each $opendFiles as file, index}
       <FileView abspath={file.path} {index} />
     {/each}
+  {:else}
+  File Explorer
   {/if}
 </div>
 

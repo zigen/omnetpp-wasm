@@ -3,9 +3,8 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { resolve } from "path"
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
-
-  const isProduction = mode === "production"
+export default defineConfig(({ command, mode  }) => {
+  const isProduction = mode === "production";
   return {
     plugins: [svelte({ hot: false })],
     build: {
@@ -15,9 +14,7 @@ export default defineConfig(({ command, mode }) => {
         format: "esm",
       },
       emptyOutDir: false,
-      //outDir: "../omnetpp/samples/tictoc/out/emcc-release",
-      // outDir: "../../quisp/quisp/out/emcc-release",
-      outDir: "../js-build",
+      outDir: isProduction ? "../js-build" : "../../quisp/quisp/out/emcc-release",
       watch: isProduction ? null : {},
       minify: isProduction,
       rollupOptions: {
