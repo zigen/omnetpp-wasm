@@ -1,4 +1,4 @@
-From 096a2f837b8ff3536a33a7e39ad3da30ab649d82 Mon Sep 17 00:00:00 2001
+From fe13b47a09a2695bf7d4b14976e3822e0f2bb477 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Thu, 18 Aug 2022 10:33:31 +0900
 Subject: [PATCH 7/7] disable debug on wasm

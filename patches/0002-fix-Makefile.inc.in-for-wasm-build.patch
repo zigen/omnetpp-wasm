@@ -1,4 +1,4 @@
-From 8925d3940cb391aa2e5cbd2fa1f12266622cebca Mon Sep 17 00:00:00 2001
+From 2c4f416ca40b5b381f9e4d74f65d63bd5c4d29ec Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:48:22 +0900
 Subject: [PATCH 2/7] fix Makefile.inc.in for wasm build
@@ -9,7 +9,7 @@ link qtsvg, qwasm and all libraries
  1 file changed, 55 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile.inc.in b/Makefile.inc.in
-index fe9fcd8210..8e74b96106 100644
+index fe9fcd8210..e3f1de29c8 100644
 --- a/Makefile.inc.in
 +++ b/Makefile.inc.in
 @@ -187,7 +187,7 @@ IMPLIB_SUFFIX = @IMPLIB_SUFFIX@
@@ -85,8 +85,8 @@ index fe9fcd8210..8e74b96106 100644
 +	sed -i 's/@APPNAME@/$(basename $(TARGET))/' $O/$(TARGET:.js=)
 +	echo '<script type="module" src="./main.js"></script>' >> $O/index.html
 +	echo '<link href="./style.css" rel="stylesheet">' >> $O/index.html
-+	cp /root/omnetpp/dist/main.js $O/main.js
-+	cp /root/omnetpp/dist/style.css $O/style.css
++	cp /root/js-build/main.js $O/main.js
++	cp /root/js-build/style.css $O/style.css
 +
 +%.js: index.html
 +
