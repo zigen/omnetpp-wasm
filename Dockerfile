@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM --platform=linux/amd64  ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG VERSION=6.0
@@ -30,7 +30,7 @@ RUN bash -c "source setenv && ./configure WITH_OSG=no && \
     make -j $(nproc) MODE=release base && \
     rm -r doc out test samples config.log config.status"
 
-FROM emscripten/emsdk:2.0.25
+FROM --platform=linux/amd64 emscripten/emsdk:2.0.25
 ARG VERSION=6.0
 ENV PATH /root/omnetpp/bin:$PATH
 ENV QT_LOGGING_RULES=*.debug=false;qt.qpa.*=false
