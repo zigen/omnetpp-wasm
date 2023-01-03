@@ -1,7 +1,7 @@
-From f62539b98621a6252c4b71f44491dd86b3644567 Mon Sep 17 00:00:00 2001
+From c7ec22fdfdb752c155fdc30939d026e6942b0172 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Wed, 17 Aug 2022 01:18:27 +0900
-Subject: [PATCH 5/7] remove runUntil and Express run
+Subject: [PATCH 5/8] remove runUntil and Express run
 
 ---
  src/qtenv/mainwindow.cc | 10 ---------
@@ -107,5 +107,5 @@ index 72d1bc85e2..3050a34d8c 100644
     <property name="icon">
      <iconset resource="icons.qrc">
 -- 
-2.37.2
+2.39.0
 

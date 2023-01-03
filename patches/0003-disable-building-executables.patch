@@ -1,7 +1,7 @@
-From a4d0713fd5409d8b28e28614f2cb6ae46c97e4d9 Mon Sep 17 00:00:00 2001
+From fd4261fd718395226d392cdd4b75bdfa28fb6cae Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:49:25 +0900
-Subject: [PATCH 3/7] disable building executables
+Subject: [PATCH 3/8] disable building executables
 
 ---
  src/eventlog/Makefile |  2 +-
@@ -74,5 +74,5 @@ index b03cf981c0..c06406cb1b 100644
  clean:
  	$(qecho) Cleaning utils
 -- 
-2.37.2
+2.39.0
 

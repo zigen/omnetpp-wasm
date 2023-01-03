@@ -1,7 +1,7 @@
-From bccf56a1f317a27fa08fe0e32f807ebeb3a3d507 Mon Sep 17 00:00:00 2001
+From 4d489b635d6b3a1f93814ac2a34c88a78fd63780 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Wed, 17 Aug 2022 13:24:14 +0900
-Subject: [PATCH 6/7] fix msgbox mainloop error
+Subject: [PATCH 6/8] fix msgbox mainloop error
 
 ---
  src/qtenv/qtenv.cc | 22 +++++++++++++++++++---
@@ -43,5 +43,5 @@ index 06191ea372..9c7fad7f1e 100644
  }
  
 -- 
-2.37.2
+2.39.0
 

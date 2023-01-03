@@ -1,7 +1,7 @@
-From ac203ff2e65048ba38d3bd3089551f532c1013ba Mon Sep 17 00:00:00 2001
+From 0b694cee707738c8717f50f2a3241c62b1eca853 Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Fri, 5 Aug 2022 15:51:11 +0900
-Subject: [PATCH 4/7] stop creating new main loop
+Subject: [PATCH 4/8] stop creating new main loop
 
 because wasm runs in single thread environment
 also import WasmPlatform and SVG plugins
@@ -591,5 +591,5 @@ index ad550043b2..04ce5e60fc 100644
      }
  }
 -- 
-2.37.2
+2.39.0
 

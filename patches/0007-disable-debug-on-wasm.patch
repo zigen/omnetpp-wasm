@@ -1,7 +1,7 @@
-From fe13b47a09a2695bf7d4b14976e3822e0f2bb477 Mon Sep 17 00:00:00 2001
+From d777a174b26044f50b95e51e30b3262452b6effb Mon Sep 17 00:00:00 2001
 From: zigen <hrlclb@gmail.com>
 Date: Thu, 18 Aug 2022 10:33:31 +0900
-Subject: [PATCH 7/7] disable debug on wasm
+Subject: [PATCH 7/8] disable debug on wasm
 
 ---
  src/qtenv/mainwindow.cc |  2 --
@@ -111,5 +111,5 @@ index 3050a34d8c..15b3bc5cc0 100644
   <layoutdefault spacing="6" margin="11"/>
   <resources>
 -- 
-2.37.2
+2.39.0
 

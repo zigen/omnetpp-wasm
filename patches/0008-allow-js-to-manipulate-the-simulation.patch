@@ -1,0 +1,109 @@
+From 45aaccfb574b77c15a8e958b91cf8880515d5842 Mon Sep 17 00:00:00 2001
+From: zigen <hrlclb@gmail.com>
+Date: Wed, 4 Jan 2023 00:41:53 +0900
+Subject: [PATCH 8/8] allow js to manipulate the simulation
+
+---
+ src/qtenv/mainwindow.h         |  1 +
+ src/qtenv/qtenv.cc             | 38 ++++++++++++++++++++++++++++++++++
+ src/qtenv/runselectiondialog.h |  2 +-
+ 3 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/src/qtenv/mainwindow.h b/src/qtenv/mainwindow.h
+index de630e0270..47f3955f2d 100644
+--- a/src/qtenv/mainwindow.h
++++ b/src/qtenv/mainwindow.h
+@@ -192,6 +192,7 @@ private:
+         NONE
+     } simTimeDigitGrouping, eventNumDigitGrouping;
+ 
++public:
+     void runSimulation(RunMode runMode);
+     void stopSimulation();
+     // If runMode is currently active, stops; otherwise starts in runMode.
+diff --git a/src/qtenv/qtenv.cc b/src/qtenv/qtenv.cc
+index 9c7fad7f1e..bc853fa848 100644
+--- a/src/qtenv/qtenv.cc
++++ b/src/qtenv/qtenv.cc
+@@ -38,6 +38,8 @@
+ #include <QtCore/QEventLoop>
+ #include <QtGui/QPainter>
+ 
++#include <emscripten/bind.h>
++
+ #include "common/stringutil.h"
+ #include "common/stringtokenizer.h"
+ #include "common/fileutil.h"
+@@ -1722,6 +1724,16 @@ void Qtenv::initialSetUpConfiguration()
+             dialog->open();
+             while(!accepted) {
+                 emscripten_sleep(10);
++                int skip_asking = EM_ASM_INT({ 
++                    if (window.qtenvSkipRunSelection) {
++                        return 1;
++                    }
++                    return 0;
++                });
++                if (skip_asking) {
++                    accepted = true;
++                    dialog->accept();
++                }
+             }
+ 
+             config = dialog->getConfigName();
+@@ -1740,6 +1752,9 @@ void Qtenv::initialSetUpConfiguration()
+     mainWindow->reflectConfigOnUi();
+ 
+     QTimer::singleShot(0, mainWindow, &MainWindow::activateWindow);
++    EM_ASM(
++        if (!window.qtenvReady) setTimeout(function() { window.qtenvReady = true; }, 10);
++    );
+ }
+ 
+ void Qtenv::askParameter(cPar *par, bool unassigned)
+@@ -2817,6 +2832,29 @@ void _dummy_func()
+     _dummy_for_objecttreeinspector();
+ }
+ 
++EMSCRIPTEN_BINDINGS(opp_wasm_module) {
++    emscripten::class_<MainWindow>("MainWindow")
++    .function("runSimulation", &MainWindow::runSimulation)
++    .function("stopSimulation", &MainWindow::stopSimulation)
++    ;
++
++    emscripten::class_<Qtenv>("Qtenv")
++    .function("doRunSimulation", &Qtenv::doRunSimulation)
++    .function("getSimulationRunMode", &Qtenv::getSimulationRunMode)
++    .function("initialSetUpConfiguration", &Qtenv::initialSetUpConfiguration)
++    .function("getMainWindow", &Qtenv::getMainWindow, emscripten::allow_raw_pointers())
++    ;
++
++    emscripten::function("getQtenv", &getQtenv, emscripten::allow_raw_pointers());
++    emscripten::enum_<RunMode>("RunMode")
++    .value("NORMAL", RUNMODE_NORMAL)
++    .value("FAST", RUNMODE_FAST)
++    .value("EXPRESS", RUNMODE_EXPRESS)
++    .value("STEP", RUNMODE_STEP)
++    .value("NOT_RUNNING", RUNMODE_NOT_RUNNING)
++    .value("PAUSED", RUNMODE_PAUSED)
++    ;
++};
+ }  // namespace qtenv
+ }  // namespace omnetpp
+ 
+diff --git a/src/qtenv/runselectiondialog.h b/src/qtenv/runselectiondialog.h
+index 212273a204..1f6305f8dc 100644
+--- a/src/qtenv/runselectiondialog.h
++++ b/src/qtenv/runselectiondialog.h
+@@ -54,7 +54,7 @@ class QTENV_API RunSelectionDialog : public QDialog
+     bool configNameDefinite(); // if there is only one config, or a valid one is given as argument
+     bool configAndRunDefinite(); // the above, plus if there is only one run in the one config, or the filter only matches one
+ 
+-protected:
++public:
+     void accept() override;
+ 
+ private slots:
+-- 
+2.39.0
+
