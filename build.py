@@ -7,6 +7,8 @@ import shutil
 import re
 
 
+VERSION = "0.27.0"
+
 def parse_config():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -53,7 +55,7 @@ def gen_post_js(config):
     opp_env = config.get("ui", "Qtenv")
     ini_file = ["-f", config["ini-file"]]
     exec_args = config["exec-args"] if "exec-args" in config else [] 
-    code = f"""arguments_ = [{wrap_with_double_quote(["-m", "-u", opp_env] + config_args + ned_folders + ini_file + exec_args)}];"""
+    code = f"""window.OPP_WASM_VERSION="{VERSION}";arguments_ = [{wrap_with_double_quote(["-m", "-u", opp_env] + config_args + ned_folders + ini_file + exec_args)}];"""
     print(code)
     with open("post.js", "w") as f:
         f.write(code)
