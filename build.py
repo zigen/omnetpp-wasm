@@ -7,7 +7,7 @@ import shutil
 import re
 
 
-VERSION = "0.27.0"
+VERSION = "0.28.0"
 
 def parse_config():
     parser = argparse.ArgumentParser()
